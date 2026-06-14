@@ -1,0 +1,20 @@
+<nav class="bg-gray-900 text-white shadow-lg">
+  <div class=" max-w-7xl mx-auto px-4">
+    <div class="flex justify-between items-center h-16">
+      <div class="flex items-center">
+        <span class="text-2xl font-bold text-blue-300">
+          FilmHub
+        </span>
+      </div>
+      <div class="hidden md:flex space-x-8 ml-auto">
+        <a class="hover:text-blue-500 transition" routerLink="/datum" routerLinkActive="text-gray-500 border-b-2">Home</a>
+        <a class="hover:text-blue-500 transition" routerLink="/test" routerLinkActive="text-gray-500 border-b-2">Kategorien</a>
+        @if (!authService.isLoggedIn()){
+          <a class="hover:text-blue-500 transition" routerLink="/login" routerLinkActive="text-gray-500 border-b-2">Login</a>
+        } @else{
+          <a class="hover:text-blue-500 transition" routerLink="/account" routerLinkActive="text-gray-500 border-b-2">Account</a>
+        }
+      </div>
+    </div>
+  </div>
+</nav>
