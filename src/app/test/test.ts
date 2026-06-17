@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { FormsModule} from '@angular/forms';
 
-
 @Component({
   selector: 'app-test',
   imports: [FormsModule],
@@ -9,13 +8,6 @@ import { FormsModule} from '@angular/forms';
   styleUrl: './test.css',
 })
 export class Test {
-  username = "Nutzername"
-  clickbar = true
-  title = "Sexy Silvan"
-  onButtonClick() {
-    alert("Tim stinkt!");
-    this.clickbar = false
-  }
   filme = [{name: "Star Wars 1",
                                             datum: "21.04.2026",
                                               time: "09:00"},
@@ -26,4 +18,3 @@ export class Test {
                                             datum: "21.04.2026",
                                               time: "15:00"}]
 }
-
