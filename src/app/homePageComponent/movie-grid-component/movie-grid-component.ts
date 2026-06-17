@@ -1,12 +1,10 @@
 import { Component } from '@angular/core';
-import { MovieCard } from '../movie-card/movie-card';
+import { MovieRow } from '../movie-row/movie-row';
 
 @Component({
   selector: 'app-movie-grid-component',
-  imports: [MovieCard],
+  imports: [MovieRow],
   templateUrl: './movie-grid-component.html',
   styleUrl: './movie-grid-component.css',
 })
-export class MovieGridComponent {
-
-}
+export class MovieGridComponent {}
