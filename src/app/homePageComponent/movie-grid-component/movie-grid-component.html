@@ -1,1 +1,28 @@
-<p>movie-grid-component works!</p>
+<div>
+  <h1 class="align-left text-black text-3xl ml-6 my-2 font-bold" >Am besten bewertet:</h1>
+  <div class="grid grid-cols-5 gap-4 px-6 py-3 content-start ">
+    <app-movie-card [movie]="{
+    title: 'Interstellar',
+    description: 'Eine Reise durch Raum und Zeit.',
+    image: 'assets/images/interstellar.jpg'
+  }" >
+
+    </app-movie-card>
+    <app-movie-card [movie]="{
+    title: 'Interstellar',
+    description: 'Eine Reise durch Raum und Zeit.',
+    image: 'assets/images/interstellar.jpg'
+  }">
+
+    </app-movie-card>
+    <app-movie-card [movie]="{
+    title: 'Interstellar',
+    description: 'Eine Reise durch Raum und Zeit.',
+    image: 'assets/images/interstellar.jpg'
+  }" >
+
+    </app-movie-card>
+
+  </div>
+</div>
+
