@@ -11,6 +11,5 @@ import { MovieCard } from '../movie-card/movie-card';
 export class MovieRow {
   @Input() daten!:{
     kategorie: string,
-    anzahl: number,
   }
 }

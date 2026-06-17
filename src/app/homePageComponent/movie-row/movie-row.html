@@ -1,6 +1,6 @@
 <div>
   <h1 class="align-left text-black text-3xl ml-10 my-2 font-bold" >{{daten.kategorie}}</h1>
-  <div class="grid grid-cols-{{daten.anzahl}} gap-4 px-10 py-3 content-start ">
+  <div class="grid grid-cols-5 gap-4 px-10 py-3 content-start ">
     <app-movie-card [movie]="{
     title: 'Interstellar',
     description: 'Eine Reise durch Raum und Zeit.',
@@ -29,13 +29,7 @@
   }" >
 
     </app-movie-card>
-    <app-movie-card [movie]="{
-    title: 'Interstellar',
-    description: 'Eine Reise durch Raum und Zeit.',
-    image: 'assets/images/interstellar.jpg'
-  }" >
 
-    </app-movie-card>
 
   </div>
 </div>
