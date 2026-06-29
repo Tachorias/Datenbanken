@@ -1,0 +1,77 @@
+<main class="min-h-screen bg-gray-200 text-black flex justify-center px-6 py-12">
+
+  <section class="w-full max-w-4xl">
+
+    <h1 class="text-4xl font-bold mb-8">
+      Mein Account
+    </h1>
+
+    <div class="bg-white rounded-2xl shadow-lg p-8">
+
+      <div class="flex items-center gap-6 mb-8">
+
+        <div class="w-24 h-24 rounded-full bg-blue-600 text-white flex items-center justify-center text-4xl font-bold">
+          T
+        </div>
+
+        <div>
+          <h2 class="text-3xl font-bold">
+            {{ benutzername }}
+          </h2>
+
+          <p class="text-gray-500 mt-1">
+            Nutzer
+          </p>
+          <p class="text-green-600 font-bold">
+            Eingeloggt
+          </p>
+
+
+
+        </div>
+
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+
+
+        <div class="border rounded-xl p-5">
+          <h3 class="text-xl font-bold mb-2">
+            Filme mit "Gefällt mir"-Makierung
+          </h3>
+
+          <p class="text-gray-600">
+            Filme anzeigen...
+          </p>
+        </div>
+
+        <div class="border rounded-xl p-5">
+          <h3 class="text-xl font-bold mb-2">
+            Einstellungen
+          </h3>
+
+          <p class="text-gray-600">
+            Profil bearbeiten, Passwort ändern oder Account vlt. auch löschen...
+          </p>
+        </div>
+
+
+
+      </div>
+
+      <div class="mt-8 flex justify-end">
+        <button
+          class="bg-red-600 text-white font-bold px-6 py-2 rounded-xl hover:bg-red-700 transition"
+          type="button"
+          (click)="abmelden()"
+        >
+          Abmelden
+        </button>
+      </div>
+
+    </div>
+
+  </section>
+
+</main>

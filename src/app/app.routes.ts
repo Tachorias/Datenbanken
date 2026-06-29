@@ -6,6 +6,7 @@ import {AgbComponent} from './legalComponent/agb-component/agb-component';
 import {DatenschutzComponent} from './legalComponent/datenschutz-component/datenschutz-component';
 import {ImpressumComponent} from './legalComponent/impressum-component/impressum-component';
 import { MovieGridComponent } from './homePageComponent/movie-grid-component/movie-grid-component';
+import { AccountComponent } from './account-component/account-component';
 
 export const routes: Routes = [
   {path: '', redirectTo: 'datum', pathMatch: 'full'},
@@ -16,4 +17,5 @@ export const routes: Routes = [
   {path: 'datenschutz', component: DatenschutzComponent},
   {path: 'impressum', component: ImpressumComponent},
   {path: 'home', component: MovieGridComponent},
+  {path: 'account', component: AccountComponent },
 ];
