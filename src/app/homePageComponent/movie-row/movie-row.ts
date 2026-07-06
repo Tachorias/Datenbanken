@@ -1,81 +1,61 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges, OnDestroy } from '@angular/core';
 import { MovieCard } from '../movie-card/movie-card';
-import { ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import { FilmeService } from "../../services/filme";
+import { Observable, Subscription } from "rxjs";
+import { MovieCardInterface } from "../movie-card/movie-card.interface";
+import { AsyncPipe } from '@angular/common';
+
 @Component({
   selector: 'app-movie-row',
-  imports: [MovieCard],
+  imports: [MovieCard, AsyncPipe],
   templateUrl: './movie-row.html',
   styleUrl: './movie-row.css',
 })
-export class MovieRow {
-  @Input() daten!:{
+export class MovieRow implements OnChanges, OnDestroy {
+  @Input() daten!: {
     kategorie: string,
-  }
-  movies = [
-    { title: 'Interstellar', image: 'assets/images/interstellar.jpg', description: "Good Movie" },
-    { title: 'Inception', image: 'assets/images/inception.jpg' , description: "Good Movie" },
-    { title: 'Tenet', image: 'assets/images/tenet.jpg' , description: "Good Movie" },
-    { title: 'Dune', image: 'assets/images/dune.jpg' , description: "Good Movie" },
-    { title: 'Avatar', image: 'assets/images/avatar.jpg' , description: "Good Movie" },
-    { title: 'Matrix', image: 'assets/images/matrix.jpg' , description: "Good Movie" }
-  ];
-  showMovies: any = [];
-
-  currentIndex = 1; // Halts die Position des ersten sichtbaren Films
-  globalFilmCount = 0;
-  slideWidth = 0;
-
-  itemsPerView = 4; // entspricht w-1/4
-
-  ngOnInit() {
-    this.showMovies = [
-      ...this.movies.slice(0, Math.min(this.itemsPerView+1, this.movies.length))
-    ];
+    sortierung: string,
   }
 
-  private addLast(){
-    this.globalFilmCount = (this.globalFilmCount + 1) % this.movies.length;
-    this.showMovies.push(this.movies[(this.globalFilmCount + this.itemsPerView) % this.movies.length]);
-    this.showMovies.shift();
-    console.log(this.showMovies);
-  }
-  private addFirst() {
-    this.globalFilmCount = (this.globalFilmCount - 1);
-    if (this.globalFilmCount < 0) {
-      this.globalFilmCount = this.movies.length - 1;
+  movies$!: Observable<MovieCardInterface[]>;
+  private sub?: Subscription;
+  private moviesLength = 0;
+
+  startIndex = 0;
+  itemsPerView = 4; // number of visible items
+
+  constructor(private filmService: FilmeService) {}
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['daten'] && this.daten) {
+      this.ladeFilme();
     }
-    this.showMovies.unshift(this.movies[this.globalFilmCount == 0? this.movies.length -1 :(this.globalFilmCount - 1)]);
-    this.showMovies.splice(this.showMovies.length-1,1);
-    console.log(this.showMovies);
+  }
+
+  ladeFilme() {
+    if (!this.daten) return;
+    this.movies$ = this.filmService.getFilmeSortiert(this.daten.sortierung);
+    this.sub?.unsubscribe();
+    this.sub = this.movies$.subscribe(movies => {
+      this.moviesLength = (movies || []).length;
+      // reset index if out of range
+      if (this.startIndex >= this.moviesLength) this.startIndex = 0;
+    });
   }
 
   next() {
-    this.currentIndex = 2;
-    this.addLast();
-   this.currentIndex = 1;
+    if (this.startIndex + this.itemsPerView < this.moviesLength) {
+      this.startIndex++;
+    }
   }
 
   prev() {
-    this.currentIndex = 0;
-    this.addFirst();
-    this.currentIndex = 1;
-  }
-  @ViewChild('track') track!: ElementRef;
-
-
-  ngAfterViewInit() {
-    this.calculateSlideWidth();
-    window.addEventListener('resize', () => this.calculateSlideWidth());
-    this.showMovies.unshift(this.movies[this.movies.length - 1])
+    if (this.startIndex > 0) {
+      this.startIndex--;
+    }
   }
 
-  calculateSlideWidth() {
-    const el = this.track.nativeElement.querySelector('.slide');
-    this.slideWidth = el.offsetWidth;
-  }
-
-  getTransform() {
-    console.log(this.currentIndex);
-    return `translateX(-${this.currentIndex * this.slideWidth}px)`;
+  ngOnDestroy() {
+    this.sub?.unsubscribe();
   }
 }

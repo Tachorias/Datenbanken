@@ -1,29 +1,38 @@
-<div class="relative px-10">
+<h1 class="text-2xl font-bold mb-4 ml-5 mt-2">
+  {{daten.kategorie}}
+</h1>
 
-  <button
-    (click)="prev()"
-    class="absolute left-2 top-1/2 -translate-y-1/2 z-20 size-5">
-    ❮
-  </button>
+<div class="relative px-10">
+  @if(startIndex > 0) {
+    <button
+      (click)="prev()"
+      class="absolute left-2 top-1/2 -translate-y-1/2 z-20 size-5">
+      ❮
+    </button>
+  }
 
   <div class="overflow-hidden">
 
-    <div #track
-         class="flex transition-transform duration-300 ease-in-out"
-         [style.transform]="getTransform()">
-      @for (movie of showMovies; track movie) {
-        <div class="slide w-1/4 flex-shrink-0 px-2">
-          <app-movie-card [movie]="movie"></app-movie-card>
-        </div>
+    <div #track class="flex">
+      @if((movies$ | async); as movies){
+        @for (movie of movies.slice(startIndex, startIndex + itemsPerView); track movie) {
+          <div class="w-1/4 flex-shrink-0 px-2">
+            <app-movie-card [movie]="movie"></app-movie-card>
+          </div>
+        }
       }
     </div>
 
   </div>
 
-  <button
-    (click)="next()"
-    class="absolute right-2 top-1/2 -translate-y-1/2 z-20">
-    ❯
-  </button>
+  @if((movies$ | async); as movies) {
+    @if(startIndex + itemsPerView < movies.length) {
+      <button
+        (click)="next()"
+        class="absolute right-2 top-1/2 -translate-y-1/2 z-20">
+        ❯
+      </button>
+    }
+  }
 
 </div>

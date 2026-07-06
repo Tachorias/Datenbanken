@@ -1,4 +1,6 @@
 import { Component, Input } from '@angular/core';
+import {MovieCardInterface} from "./movie-card.interface";
+
 
 @Component({
   selector: 'app-movie-card',
@@ -10,9 +12,5 @@ export class MovieCard {
   @Input() cardSize!:{
     width: number;
   }
-  @Input() movie!:{
-    title: string;
-    image: string;
-    description: string;
-  }
+  @Input() movie!: MovieCardInterface;
 }
