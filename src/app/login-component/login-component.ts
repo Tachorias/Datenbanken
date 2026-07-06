@@ -13,10 +13,15 @@ export class LoginComponent {
   benutzername = '';
   passwort = '';
   fehlermeldung = '';
+  zeigeRegister = false;
+  registerBenutzername = '';
+  registerPasswort = '';
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+
+
   ) {}
 
   anmelden(): void {
@@ -32,6 +37,21 @@ export class LoginComponent {
       this.fehlermeldung = 'Benutzername oder Passwort ist falsch.';
     }
   }
+  registrieren(): void {
+    const erfolg = this.authService.register(
+      this.registerBenutzername,
+      this.registerPasswort
+    );
+
+    if (erfolg) {
+      this.fehlermeldung = '';
+      this.zeigeRegister = false;
+    } else {
+      this.fehlermeldung = 'Registrierung fehlgeschlagen.';
+    }
+  }
+
+
 }
 
 

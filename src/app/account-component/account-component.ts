@@ -4,15 +4,12 @@ import { AuthService } from '../services/auth-service';
 
 @Component({
   selector: 'app-account-component',
-  imports: [],
   templateUrl: './account-component.html',
   styleUrl: './account-component.css',
 })
 export class AccountComponent implements OnInit {
 
-  // Vorläufiger Benutzername
-  // Später kommt dieser Wert aus der Datenbank
-  benutzername = 'tim';
+  benutzername: string | null = null;
 
   constructor(
     private authService: AuthService,
@@ -20,11 +17,12 @@ export class AccountComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Falls der Nutzer nicht eingeloggt ist,
-    // wird er zurück zur Login-Seite geschickt
     if (!this.authService.isLoggedIn()) {
       this.router.navigate(['/login']);
+      return;
     }
+
+    this.benutzername = this.authService.getUser();
   }
 
   abmelden(): void {

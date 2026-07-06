@@ -1,58 +1,85 @@
 import { Injectable } from '@angular/core';
 
-// Vorläufige Login-Daten
-// Später kommen diese Daten aus der Datenbank
-const vorlaeufigerBenutzername = 'tim';
-const vorlaeufigesPasswort = '123';
+interface User {
+  username: string;
+  password: string;
+}
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
 
-  // Name des Eintrags im Browser-Speicher
   private speicherSchluessel = 'token';
+  private userKey = 'users';
 
-  // Prüft, ob der Nutzer eingeloggt ist
+  // 🧠 lädt User aus localStorage
+  private getUsers(): User[] {
+    const data = localStorage.getItem(this.userKey);
+    return data ? JSON.parse(data) : [];
+  }
+
+  // 💾 speichert User in localStorage
+  private saveUsers(users: User[]): void {
+    localStorage.setItem(this.userKey, JSON.stringify(users));
+  }
+
+  login(benutzername: string, passwort: string): boolean {
+    const users = this.getUsers();
+
+    const cleanUsername = benutzername.trim();
+    const cleanPassword = passwort.trim();
+
+    const user = users.find(
+      u =>
+        u.username.toLowerCase() === cleanUsername.toLowerCase() &&
+        u.password === cleanPassword
+    );
+
+    if (user) {
+      localStorage.setItem(this.speicherSchluessel, cleanUsername);
+      return true;
+    }
+
+    return false;
+  }
+
+  register(benutzername: string, passwort: string): boolean {
+    const users = this.getUsers();
+
+    const cleanUsername = benutzername.trim();
+    const cleanPassword = passwort.trim();
+
+    if (!cleanUsername || !cleanPassword) return false;
+
+    const exists = users.find(
+      u => u.username.toLowerCase() === cleanUsername.toLowerCase()
+    );
+
+    if (exists) return false;
+
+    users.push({
+      username: cleanUsername,
+      password: cleanPassword
+    });
+
+    this.saveUsers(users);
+    return true;
+  }
+
+
+  // 👀 prüfen ob eingeloggt
   isLoggedIn(): boolean {
     return !!localStorage.getItem(this.speicherSchluessel);
   }
 
-  // Versucht den Nutzer einzuloggen
-  login(benutzername: string, passwort: string): boolean {
-
-    // Prüft, ob Benutzername und Passwort stimmen
-    if (
-      benutzername === vorlaeufigerBenutzername &&
-      passwort === vorlaeufigesPasswort
-    ) {
-      // Speichert einen vorläufigen Token im Browser
-      localStorage.setItem(this.speicherSchluessel, 'angemeldet');
-
-      // Login war erfolgreich
-      return true;
-    }
-
-    // Login war nicht erfolgreich
-    return false;
-  }
-
-  // Loggt den Nutzer wieder aus
+  // 🚪 logout
   logout(): void {
     localStorage.removeItem(this.speicherSchluessel);
   }
+
+  // 👤 aktueller User
+  getUser(): string | null {
+    return localStorage.getItem(this.speicherSchluessel);
+  }
 }
-
-
-
-
-
-//import { Injectable } from '@angular/core';
-//@Injectable({
-//  providedIn: 'root',
-//})
-//export class AuthService {
-//  isLoggedIn(): boolean{
-//    return !!localStorage.getItem('token');
-//  }
-//}
