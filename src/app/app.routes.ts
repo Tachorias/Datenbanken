@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import {Datum} from './datum/datum';
 import {Test} from './test/test';
 import {LoginComponent} from './login-component/login-component';
 import {AgbComponent} from './legalComponent/agb-component/agb-component';
@@ -7,7 +6,6 @@ import {DatenschutzComponent} from './legalComponent/datenschutz-component/daten
 import {ImpressumComponent} from './legalComponent/impressum-component/impressum-component';
 import { MovieGridComponent } from './homePageComponent/movie-grid-component/movie-grid-component';
 import { AccountComponent } from './account-component/account-component';
-import {MovieViewComponent} from './movie-view-component/movie-view-component';
 
 export const routes: Routes = [
   {path: '', redirectTo: 'home', pathMatch: 'full'},
