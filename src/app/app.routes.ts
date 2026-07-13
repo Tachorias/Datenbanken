@@ -7,10 +7,10 @@ import {DatenschutzComponent} from './legalComponent/datenschutz-component/daten
 import {ImpressumComponent} from './legalComponent/impressum-component/impressum-component';
 import { MovieGridComponent } from './homePageComponent/movie-grid-component/movie-grid-component';
 import { AccountComponent } from './account-component/account-component';
+import {MovieViewComponent} from './movie-view-component/movie-view-component';
 
 export const routes: Routes = [
-  {path: '', redirectTo: 'datum', pathMatch: 'full'},
-  {path: 'datum', component: Datum},
+  {path: '', redirectTo: 'home', pathMatch: 'full'},
   {path: 'test', component: Test},
   {path: 'login', component: LoginComponent},
   {path: 'agb', component: AgbComponent},
