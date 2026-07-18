@@ -6,6 +6,7 @@ import {DatenschutzComponent} from './legalComponent/datenschutz-component/daten
 import {ImpressumComponent} from './legalComponent/impressum-component/impressum-component';
 import { MovieGridComponent } from './homePageComponent/movie-grid-component/movie-grid-component';
 import { AccountComponent } from './account-component/account-component';
+import { MovieView } from './movie-view/movie-view';
 
 export const routes: Routes = [
   {path: '', redirectTo: 'home', pathMatch: 'full'},
@@ -16,4 +17,5 @@ export const routes: Routes = [
   {path: 'impressum', component: ImpressumComponent},
   {path: 'home', component: MovieGridComponent},
   {path: 'account', component: AccountComponent },
+  {path: 'movie', component: MovieView},
 ];

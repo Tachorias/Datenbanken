@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
-import {MovieCardInterface} from "./movie-card.interface";
+import { Router } from '@angular/router';
+import { MovieCardInterface } from "./movie-card.interface";
 
 
 @Component({
@@ -13,4 +14,10 @@ export class MovieCard {
     width: number;
   }
   @Input() movie!: MovieCardInterface;
+
+  constructor(private router: Router) {}
+
+  openMovie() {
+    this.router.navigate(['/movie'], { state: { movie: this.movie } });
+  }
 }

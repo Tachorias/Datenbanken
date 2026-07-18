@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { Datum } from './datum';
+import { MovieView } from './movie-view';
 
-describe('Datum', () => {
-  let component: Datum;
-  let fixture: ComponentFixture<Datum>;
+describe('MovieView', () => {
+  let component: MovieView;
+  let fixture: ComponentFixture<MovieView>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Datum],
+      imports: [MovieView],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(Datum);
+    fixture = TestBed.createComponent(MovieView);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });
