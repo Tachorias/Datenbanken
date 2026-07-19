@@ -1,18 +1,27 @@
 <div>
   <style>
-    .movie-container { width: 100%; max-width: 1280px; margin: 1% auto; }
-    .movie-container video { width: 100%; height: auto; display: block; }
-    .movie-title, .movie-description { text-align: left; }
+    .movie-container { width: 100%; max-width: 1440px; margin: 1% auto; display: flex; gap: 3rem; align-items: flex-start; justify-content: flex-start; }
+    .video-section { flex: 3; }
+    .video-section video { width: 100%; height: auto; display: block; }
+    .content-section { flex: 1; }
+    .movie-title { text-align: left; margin: 0 0 1rem 0; }
+    .movie-description { text-align: left; }
   </style>
 
   <div class="movie-container">
-    <video controls>
-      <source src="assets/filme/{{ movie?.idFilme }}.mp4" type="video/mp4" />
-      Your browser does not support the video tag.
-    </video>
+    <div class="video-section">
+      <video controls>
+        <source src="assets/filme/{{ movie?.idFilme }}.mp4" type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+    </div>
 
-    <h1 class="movie-title bold my-5 text-4xl">{{ movie?.Titel }}</h1>
-
-    <p class="movie-description text-xl">{{ movie?.Beschreibung }}</p>
+    <div class="content-section">
+      <h1 class="movie-title bold text-6xl">{{ movie?.Titel }}</h1>
+      <p class="movie-description text-xl">{{ movie?.Beschreibung }}</p>
+    </div>
   </div>
+</div>
+<div>
+  <app-comment-grid-component></app-comment-grid-component>
 </div>

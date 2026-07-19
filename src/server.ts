@@ -44,6 +44,16 @@ app.get('/api/movies/likes', (req, res) => {
   });
 })
 
+app.get('/api/movies/likes/:id', (req, res) => {
+  con.query('SELECT COUNT(*) AS anzahl_likes FROM Likes WHERE idFilm = ?' , [req.params.id], (err, result) => {
+    if (err) {
+      res.status(500).send('Error fetching like count');
+    } else {
+      res.json(result);
+    }
+  });
+})
+
 app.get('/api/movies/aufrufe', (req, res) => {
   con.query('SELECT * FROM Filme ORDER BY Aufrufe DESC ', (err, result) => {
     if (err) {
@@ -67,7 +77,7 @@ app.get('/api/movies/:id', (req, res) => {
 app.get('/api/login/:username/:password', (req, res) => {
   con.query('SELECT * FROM Benutzer WHERE Benutzername = ? AND Passwort = ?', [req.params.username, req.params.password], (err, result) => {
     if (err) {
-      res.status(500).send('Fehler beim Login');
+      res.status(500).send('Benutzername oder Passwort Falsch!');
     } else {
       res.json(result);
     }

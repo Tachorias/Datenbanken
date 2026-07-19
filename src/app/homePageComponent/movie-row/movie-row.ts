@@ -1,6 +1,6 @@
 import { Component, Input, OnChanges, SimpleChanges, OnDestroy } from '@angular/core';
 import { MovieCard } from '../movie-card/movie-card';
-import { FilmeService } from "../../services/filme";
+import { FilmeService } from "../../services/filme-service";
 import { Observable, Subscription } from "rxjs";
 import { MovieCardInterface } from "../movie-card/movie-card.interface";
 import { AsyncPipe } from '@angular/common';
