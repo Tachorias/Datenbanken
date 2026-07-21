@@ -9,18 +9,20 @@
   </style>
 
   <div class="movie-container">
-    <div class="video-section">
-      <video controls>
-        <source src="assets/filme/{{ movie?.idFilme }}.mp4" type="video/mp4" />
-        Your browser does not support the video tag.
-      </video>
-    </div>
+    @if (movie$ | async; as movie) {
+      <div class="video-section">
+        <video controls>
+          <source src="assets/filme/{{ movie.idFilme }}.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+      </div>
 
-    <div class="content-section">
-      <h1 class="movie-title bold text-6xl">{{ movie?.Titel }}</h1>
-      <p class="movie-description text-xl">{{ movie?.Beschreibung }}</p>
+      <div class="content-section">
+        <h1 class="movie-title bold text-6xl">{{ movie.Titel }}</h1>
+        <p class="movie-description text-xl">{{ movie.Beschreibung }}</p>
+      </div>
+    }
     </div>
-  </div>
 </div>
 <div>
   <app-comment-grid-component></app-comment-grid-component>

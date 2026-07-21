@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {MovieCardInterface} from '../homePageComponent/movie-card/movie-card.interface';
-import {Observable} from 'rxjs';
+import { map, Observable } from 'rxjs';
 
 @Injectable({providedIn: 'root'})
 export class FilmeService {
@@ -15,8 +15,10 @@ export class FilmeService {
     return this.http.get<MovieCardInterface[]>(`/api/movies/${sortierung}`);
   }
 
-  getFilm(id: number) {
-    return this.http.get(`/api/movies/${id}`);
+  getFilm(id: number): Observable<MovieCardInterface> {
+    return this.http
+      .get<MovieCardInterface[]>(`/api/movies/search/${id}`)
+      .pipe(map(movies => movies[0]));
   }
 
 }

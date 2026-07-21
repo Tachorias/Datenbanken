@@ -64,11 +64,12 @@ app.get('/api/movies/aufrufe', (req, res) => {
   });
 })
 
-app.get('/api/movies/:id', (req, res) => {
+app.get('/api/movies/search/:id', (req, res) => {
   con.query('SELECT * FROM Filme WHERE idFilme = ? ' , [req.params.id] , (err, result) => {
     if (err) {
       res.status(500).send('Error fetching movie');
     } else {
+      // return the single movie object instead of an array
       res.json(result);
     }
   })

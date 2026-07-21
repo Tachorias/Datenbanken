@@ -17,5 +17,5 @@ export const routes: Routes = [
   {path: 'impressum', component: ImpressumComponent},
   {path: 'home', component: MovieGridComponent},
   {path: 'account', component: AccountComponent },
-  {path: 'movie', component: MovieView},
+  {path: 'movie/:id', component: MovieView},
 ];
