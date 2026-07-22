@@ -7,6 +7,7 @@ import {ImpressumComponent} from './legalComponent/impressum-component/impressum
 import { MovieGridComponent } from './homePageComponent/movie-grid-component/movie-grid-component';
 import { AccountComponent } from './account-component/account-component';
 import { MovieView } from './movie-view/movie-view';
+import { UploadComponent } from './upload-component/upload-component';
 
 export const routes: Routes = [
   {path: '', redirectTo: 'home', pathMatch: 'full'},
@@ -18,4 +19,5 @@ export const routes: Routes = [
   {path: 'home', component: MovieGridComponent},
   {path: 'account', component: AccountComponent },
   {path: 'movie', component: MovieView},
+  {path: 'upload', component: UploadComponent },
 ];

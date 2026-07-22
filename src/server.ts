@@ -6,11 +6,30 @@ import {
 } from '@angular/ssr/node';
 import express from 'express';
 import { join } from 'node:path';
-import {createConnection} from 'mysql2';
+import { createConnection, ResultSetHeader } from 'mysql2';
+import { mkdirSync, renameSync } from 'node:fs';
+import multer from 'multer';
 
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
 const app = express();
+
+// Liest JSON-Daten aus Requests
+app.use(express.json());
+
+// Ordner Upload-Dateien
+const titelbildOrdner = join(process.cwd(), 'src', 'assets', 'titelbild');
+const filmOrdner = join(process.cwd(), 'src', 'assets', 'filme');
+const tempOrdner = join(process.cwd(), 'uploads', 'temp');
+
+// temporäres Speichern
+const upload = multer({
+  dest: tempOrdner,
+});
+
+// Damit Datein erreichbar im Browser
+app.use('/assets', express.static(join(process.cwd(), 'src', 'assets')));
+
 const angularApp = new AngularNodeAppEngine();
 var con = createConnection({
   host: "192.168.110.94",
@@ -83,6 +102,68 @@ app.get('/api/login/:username/:password', (req, res) => {
     }
   })
 })
+
+/**
+ * Upload
+ * Titel und Beschreibung aus dem Formular lesen, Film in Datenbank anlegen, neue FilmID erstellen = Cover(jpeg) und Film(mp4)
+ */
+app.post(
+  '/api/movies',
+  upload.fields([
+    { name: 'cover', maxCount: 1 },
+    { name: 'film', maxCount: 1 },
+  ]),
+  (req, res) => {
+    const titel = req.body.titel;
+    const beschreibung = req.body.beschreibung;
+
+    if (!titel || !beschreibung) {
+      res.status(400).send('Titel und Beschreibung müssen angegeben werden.');
+      return;
+    }
+
+    con.query(
+      'INSERT INTO Filme (Titel, Beschreibung, UploadDatum, Aufrufe) VALUES (?, ?, NOW(), 0)',
+      [titel, beschreibung],
+      (err, result: ResultSetHeader) => {
+        if (err) {
+          console.error(err);
+          res.status(500).send('Fehler beim Anlegen des Films');
+          return;
+        }
+
+        const filmId = result.insertId;
+
+        const dateien = req.files as {
+          cover?: Express.Multer.File[];
+          film?: Express.Multer.File[];
+        };
+
+        const cover = dateien.cover?.[0];
+        const film = dateien.film?.[0];
+
+        if (cover) {
+          renameSync(
+            cover.path,
+            join(titelbildOrdner, `${filmId}.jpg`)
+          );
+        }
+
+        if (film) {
+          renameSync(
+            film.path,
+            join(filmOrdner, `${filmId}.mp4`)
+          );
+        }
+
+        res.json({
+          idFilme: filmId,
+          message: 'Film wurde angelegt und Dateien wurden gespeichert.',
+        });
+      }
+    );
+  }
+);
 
 app.use(
   express.static(browserDistFolder, {

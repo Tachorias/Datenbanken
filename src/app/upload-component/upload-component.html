@@ -1,0 +1,81 @@
+<main class="min-h-screen bg-gray-200 text-black flex items-start justify-center px-6 py-12">
+
+  <section class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
+    <h1 class="text-3xl font-bold mb-6 text-center">
+      Upload
+    </h1>
+
+    <form class="flex flex-col gap-3" (ngSubmit)="hochladen()">
+
+      <label class="font-bold text-lg">Filmtitel</label>
+
+      <input
+        class="text-xl border-2 rounded-xl px-3 py-2"
+        type="text"
+        name="titel"
+        [(ngModel)]="titel"
+        required
+      >
+
+      <label class="font-bold text-lg">Beschreibung</label>
+
+      <textarea
+        class="text-xl border-2 rounded-xl px-3 py-2"
+        name="beschreibung"
+        rows="3"
+        [(ngModel)]="beschreibung"
+        required
+      ></textarea>
+
+      <label class="font-bold text-lg">Cover</label>
+
+      <p class="text-sm text-gray-600">JPEG-Datei</p>
+
+      <input
+        class="text-lg border-2 rounded-xl px-3 py-2"
+        type="file"
+        name="cover"
+        accept="image/jpeg"
+        (change)="coverAuswaehlen($event)"
+        required
+      >
+
+      @if (coverDatei) {
+        <p class="text-gray-600">
+          Cover: {{ coverDatei.name }}
+        </p>
+      }
+
+      <label class="font-bold text-lg">Filmdatei</label>
+
+      <p class="text-sm text-gray-600">MP4-Datei</p>
+
+      <input
+        class="text-lg border-2 rounded-xl px-3 py-2"
+        type="file"
+        name="film"
+        accept="video/mp4"
+        (change)="filmAuswaehlen($event)"
+        required
+      >
+
+      @if (filmDatei) {
+        <p class="text-gray-600">
+          Film: {{ filmDatei.name }}
+        </p>
+      }
+
+      @if (fehler.length > 0) {
+        <p class="text-red-600">
+          {{ fehler.join(' ') }}
+        </p>
+      }
+
+      <button
+        class="mt-4 bg-blue-600 text-white font-bold py-2 rounded-xl hover:bg-blue-700 transition"
+        type="submit"
+      >Film anlegen</button>
+
+    </form>
+  </section>
+</main>
