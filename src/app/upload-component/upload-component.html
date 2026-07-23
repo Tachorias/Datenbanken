@@ -1,14 +1,12 @@
 <main class="min-h-screen bg-gray-200 text-black flex items-start justify-center px-6 py-12">
 
+  <!--// Uploadformular-->
   <section class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
-    <h1 class="text-3xl font-bold mb-6 text-center">
-      Upload
-    </h1>
+    <h1 class="text-3xl font-bold mb-6 text-center">Upload</h1>
 
+    <!--// Erfasst Filmtitel und startet Upload-->
     <form class="flex flex-col gap-3" (ngSubmit)="hochladen()">
-
       <label class="font-bold text-lg">Filmtitel</label>
-
       <input
         class="text-xl border-2 rounded-xl px-3 py-2"
         type="text"
@@ -19,6 +17,7 @@
 
       <label class="font-bold text-lg">Beschreibung</label>
 
+      <!--// Filmbeschreibung-->
       <textarea
         class="text-xl border-2 rounded-xl px-3 py-2"
         name="beschreibung"
@@ -27,10 +26,32 @@
         required
       ></textarea>
 
+      <label class="font-bold text-lg">Kategorien</label>
+
+      <!--// auswählbare Kategorie-Schaltflächen-->
+      @if (kategorien$ | async; as kategorien) {
+        <div class="flex flex-wrap gap-2">
+
+          @for (kategorie of kategorien; track kategorie.idKategorie) {
+            <button
+              type="button"
+              class="px-2 py-1 rounded-lg text-sm font-bold bg-gray-200 text-black hover:bg-gray-400 transition"
+              [class.bg-gray-600]="istAusgewaehlt(kategorie.idKategorie)"
+              [class.text-white]="istAusgewaehlt(kategorie.idKategorie)"
+              (click)="kategorieUmschalten(kategorie.idKategorie)"
+            >
+              {{ kategorie.Name }}
+            </button>
+          }
+
+        </div>
+      }
+
       <label class="font-bold text-lg">Cover</label>
 
       <p class="text-sm text-gray-600">JPEG-Datei</p>
 
+      <!--// Wählt Cover und zeigt Dateinamen-->
       <input
         class="text-lg border-2 rounded-xl px-3 py-2"
         type="file"
@@ -39,7 +60,6 @@
         (change)="coverAuswaehlen($event)"
         required
       >
-
       @if (coverDatei) {
         <p class="text-gray-600">
           Cover: {{ coverDatei.name }}
@@ -50,6 +70,7 @@
 
       <p class="text-sm text-gray-600">MP4-Datei</p>
 
+      <!--// Wählt Filmdatei und zeigt Fehler-->
       <input
         class="text-lg border-2 rounded-xl px-3 py-2"
         type="file"

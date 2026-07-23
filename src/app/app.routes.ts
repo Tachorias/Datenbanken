@@ -8,6 +8,7 @@ import { MovieGridComponent } from './homePageComponent/movie-grid-component/mov
 import { AccountComponent } from './account-component/account-component';
 import { MovieView } from './movie-view/movie-view';
 import { UploadComponent } from './upload-component/upload-component';
+import { KategorienComponent } from './kategorien-component/kategorien-component';
 
 export const routes: Routes = [
   {path: '', redirectTo: 'home', pathMatch: 'full'},
@@ -20,4 +21,5 @@ export const routes: Routes = [
   {path: 'account', component: AccountComponent },
   {path: 'movie', component: MovieView},
   {path: 'upload', component: UploadComponent },
+  {path: 'kategorien', component: KategorienComponent},
 ];
