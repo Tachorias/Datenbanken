@@ -1,0 +1,42 @@
+<main class="bg-gray-200 min-h-screen flex items-center justify-center">
+
+  <form
+    class="flex flex-col gap-3"
+    (ngSubmit)="registrieren()">
+
+    <h1 class="text-3xl font-bold">
+      Registrieren
+    </h1>
+
+    <input
+      class="border rounded-xl p-2"
+      type="text"
+      placeholder="Benutzername"
+      [(ngModel)]="benutzername"
+      name="benutzername">
+
+    <input
+      class="border rounded-xl p-2"
+      type="password"
+      placeholder="Passwort"
+      [(ngModel)]="passwort"
+      name="passwort">
+
+    @if(fehlermeldung){
+
+      <p class="text-red-600">
+        {{fehlermeldung}}
+      </p>
+
+    }
+
+    <button
+      class="bg-green-600 text-white rounded-xl py-2">
+
+      Registrieren
+
+    </button>
+
+  </form>
+
+</main>
