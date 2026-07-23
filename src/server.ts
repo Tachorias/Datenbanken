@@ -75,7 +75,7 @@ app.get('/api/movies/search/:id', (req, res) => {
 })
 
 app.get('/api/movies/kommentare/:id', (req, res) => {
-  con.query('SELECT * FROM Kommentar WHERE idFilm = ? ' , [req.params.id] , (err, result) => {
+  con.query('SELECT * FROM Kommentar WHERE idFilm = ? ORDER BY Datum DESC' , [req.params.id] , (err, result) => {
     if (err) {
       res.status(500).send('Error fetching comments');
     } else {

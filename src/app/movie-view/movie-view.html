@@ -1,8 +1,8 @@
 @if (movie$ | async; as movie) {
   <div>
 
-    <div class="w-full max-w-screen-xl mx-auto my-4 flex gap-12 items-start justify-start">
-        <div class="w-3/4 flex flex-col gap-4">
+    <div class="w-full max-w-screen-xl mx-auto my-4 flex gap-4 items-start justify-start">
+        <div class="w-3/5 flex flex-col gap-4 ml-1">
           <div class="w-full">
             <video controls class="w-full h-auto block">
               <source src="assets/filme/{{ movie.idFilme }}.mp4" type="video/mp4" />
@@ -17,7 +17,7 @@
           </div>
         </div>
 
-        <div class="w-1/4">
+        <div class="w-2/5 mr-4">
           <app-comment-grid-component [idFilm]="movie.idFilme"></app-comment-grid-component>
         </div>
 
