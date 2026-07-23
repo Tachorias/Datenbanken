@@ -10,6 +10,7 @@ import { join } from 'node:path';
 import { createConnection, ResultSetHeader } from 'mysql2';
 import { mkdirSync, renameSync } from 'node:fs';
 import multer from 'multer';
+import bcrypt from 'bcryptjs';
 
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
@@ -208,28 +209,55 @@ app.get('/api/movies/:id', (req, res) => {
 app.post('/api/login', (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
+
+  if (!username || !password) {
+    res.status(400).json({
+      message: 'Bitte Benutzername und Passwort eingeben'
+    });
+    return;
+  }
+
   con.query(
-    'SELECT * FROM Benutzer WHERE Nutzername = ? AND Passwort = ?',
-    [username, password],
-    (err, result:any)=>{
+    'SELECT * FROM Benutzer WHERE Nutzername = ?',
+    [username],
+    async (err, result: any) => {
 
-      if(err){
-        res.status(500).send('Fehler beim Login');
-        console.log(err);
-
-      } else {
-        if(result.length > 0){
-          const user = result[0];
-          req.session.username = user['Nutzername'];
-          req.session.password = user['Passwort'];
-          res.json(result[0]);
-          console.log(result[0]);
-
-        } else {
-          res.status(401).send('Falsche Daten');
-
-        }
+      if (err) {
+        console.error(err);
+        res.status(500).json({
+          message: 'Serverfehler beim Login'
+        });
+        return;
       }
+
+      if (result.length === 0) {
+        res.status(401).json({
+          message: 'Benutzername oder Passwort falsch'
+        });
+        return;
+      }
+
+      const user = result[0];
+
+      const passwordCorrect = await bcrypt.compare(
+        password,
+        user.Passwort
+      );
+
+      if (!passwordCorrect) {
+        res.status(401).json({
+          message: 'Benutzername oder Passwort falsch'
+        });
+        return;
+      }
+
+      req.session.username = user.Nutzername;
+
+      res.json({
+        message: 'Login erfolgreich',
+        username: user.Nutzername
+      });
+
     }
   );
 });
@@ -239,11 +267,10 @@ app.get('/api/user',(req,res)=>{
   if(req.session.username){
 
     res.json({
-      Nutzername: req.session.username
+      username: req.session.username
     });
 
   }else{
-
     res.status(401).send('Nicht eingeloggt');
 
   }
@@ -262,27 +289,29 @@ app.post('/api/logout',(req,res)=>{
 
 });
 
-app.post('/api/register', (req, res) => {
+app.post('/api/register', async (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
 
-  con.query(
-    'INSERT INTO Benutzer (Nutzername, Passwort) VALUES (?, ?)',
-    [username, password],
-    (err, result) => {
-
-      if (err) {
-        res.status(500).send('Fehler beim Speichern des Benutzers');
-
-      } else {
-        res.json({
-          message: 'Registrierung erfolgreich'
-        });
-
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    con.query(
+      'INSERT INTO Benutzer (Nutzername, Passwort) VALUES (?, ?)',
+      [username, hashedPassword],
+      (err) => {
+        if (err) {
+          res.status(500).send('Fehler beim Speichern des Benutzers');
+        } else {
+          res.json({
+            message: 'Registrierung erfolgreich'
+          });
+        }
       }
-    }
-  );
-})
+    );
+  } catch {
+    res.status(500).send('Fehler beim Hashen des Passworts');
+  }
+});
 
 
 
