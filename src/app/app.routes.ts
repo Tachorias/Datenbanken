@@ -21,7 +21,7 @@ export const routes: Routes = [
   {path: 'impressum', component: ImpressumComponent},
   {path: 'home', component: MovieGridComponent},
   {path: 'account', component: AccountComponent },
-  {path: 'movie', component: MovieView},
   {path: 'upload', component: UploadComponent },
   {path: 'kategorien', component: KategorienComponent},
+  {path: 'movie/:id', component: MovieView},
 ];

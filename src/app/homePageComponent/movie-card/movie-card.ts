@@ -18,6 +18,5 @@ export class MovieCard {
   constructor(private router: Router) {}
 
   openMovie() {
-    this.router.navigate(['/movie'], { state: { movie: this.movie } });
-  }
+    this.router.navigate(['/movie/' + this.movie.idFilme]);  }
 }

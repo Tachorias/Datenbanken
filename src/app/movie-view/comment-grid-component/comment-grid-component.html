@@ -1,3 +1,10 @@
-<div>
-  <app-comment-card-component [comment]="{ verfasser: 'Zachi', inhalt: 'Dies ist ein einfacher Kommentar.', datum: '2023-10-10' }"></app-comment-card-component>
+<div class="border-2 rounded-2xl bg-amber-100">
+
+  <div class="m-2">
+    @if((kommentare$ | async); as kommentare) {
+      @for (kommentar of kommentare; track kommentar) {
+        <app-comment-card-component [comment]="kommentar"></app-comment-card-component>
+      }
+    }
+  </div>
 </div>

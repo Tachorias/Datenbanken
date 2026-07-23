@@ -196,10 +196,20 @@ app.get('/api/movies/aufrufe', (req, res) => {
   });
 })
 
-app.get('/api/movies/:id', (req, res) => {
+app.get('/api/movies/search/:id', (req, res) => {
   con.query('SELECT * FROM Filme WHERE idFilme = ? ' , [req.params.id] , (err, result) => {
     if (err) {
       res.status(500).send('Error fetching movie');
+    } else {
+      res.json(result);
+    }
+  })
+})
+
+app.get('/api/movies/kommentare/:id', (req, res) => {
+  con.query('SELECT * FROM Kommentar WHERE idFilm = ? ORDER BY Datum DESC' , [req.params.id] , (err, result) => {
+    if (err) {
+      res.status(500).send('Error fetching comments');
     } else {
       res.json(result);
     }

@@ -1,5 +1,8 @@
-<div class="width : 100% ">
-  <h1>{{ comment.verfasser }}</h1>
-  <p class="font-style: italic">{{ comment.datum }}</p>
-  <p>{{ comment.inhalt }}</p>
+<div class="justify-between items-center flex w-full mt-3">
+  <h1 class="m-0 text-sm">&#64;{{ comment.Verfasser }}</h1>
+  <p class="date" style="margin:0; font-size:0.9rem; color:gray">{{ comment.Datum | date:'dd.MM.yyyy' }}</p>
 </div>
+<div class="ml-2">
+  <p style="margin-top:0.5rem">{{ comment.Inhalt }}</p>
+</div>
+
