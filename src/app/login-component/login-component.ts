@@ -23,16 +23,39 @@ export class LoginComponent {
   ) {}
 
   async anmelden() {
+
+    this.fehlermeldung = '';
+
+    if (!this.benutzername || !this.passwort) {
+      this.fehlermeldung = 'Bitte Benutzername und Passwort eingeben';
+      return;
+    }
+
     try {
-      if (this.benutzername && this.passwort) {
-        const result = await firstValueFrom(this.authService.login(this.benutzername, this.passwort));
-        console.log("Login erfolgreich", result);
-        this.router.navigate(["/account"]);
-      }
+
+      const result = await firstValueFrom(
+        this.authService.login(
+          this.benutzername,
+          this.passwort
+        )
+      );
+
+      console.log("Login erfolgreich", result);
+
+      this.fehlermeldung = result.message;
+
+      this.router.navigate(['/account']);
+
     } catch (err: any) {
+
       console.error("Login fehlgeschlagen:", err);
+
+      if (err.error?.message) {
+        this.fehlermeldung = err.error.message;
+      } else {
+        this.fehlermeldung = 'Login fehlgeschlagen';
+      }
+
     }
   }
-
-
 }
