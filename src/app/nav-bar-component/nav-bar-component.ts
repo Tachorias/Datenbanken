@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
-import {RouterLink, RouterLinkActive} from '@angular/router';
-import {AuthService} from '../services/auth-service';
+import { Component, OnInit } from '@angular/core';
+import { RouterLink, RouterLinkActive } from '@angular/router';
+import { AuthService } from '../services/auth-service';
 
 @Component({
   selector: 'app-nav-bar-component',
@@ -11,6 +11,31 @@ import {AuthService} from '../services/auth-service';
   templateUrl: './nav-bar-component.html',
   styleUrl: './nav-bar-component.css',
 })
-export class NavBarComponent {
-  constructor(public authService: AuthService) {}
+export class NavBarComponent implements OnInit {
+
+  eingeloggt = false;
+
+
+  constructor(
+    private authService: AuthService
+  ) {}
+
+
+  ngOnInit(): void {
+
+    this.authService.getAktuellerUser()
+      .subscribe({
+
+        next: () => {
+          this.eingeloggt = true;
+        },
+
+        error: () => {
+          this.eingeloggt = false;
+        }
+
+      });
+
+  }
+
 }

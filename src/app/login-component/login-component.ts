@@ -1,67 +1,38 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../services/auth-service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-login-component',
-  imports: [FormsModule],
+  standalone: true,
+  imports: [FormsModule, RouterLink],
   templateUrl: './login-component.html',
   styleUrl: './login-component.css',
 })
 export class LoginComponent {
+
   benutzername = '';
   passwort = '';
   fehlermeldung = '';
-  zeigeRegister = false;
-  registerBenutzername = '';
-  registerPasswort = '';
 
   constructor(
     private authService: AuthService,
-    private router: Router,
-
-
+    private router: Router
   ) {}
 
-  anmelden(): void {
-    const loginErfolgreich = this.authService.login(
-      this.benutzername,
-      this.passwort
-    );
-
-    if (loginErfolgreich) {
-      this.fehlermeldung = '';
-      this.router.navigate(['/account']);
-    } else {
-      this.fehlermeldung = 'Benutzername oder Passwort ist falsch.';
-    }
-  }
-  registrieren(): void {
-    const erfolg = this.authService.register(
-      this.registerBenutzername,
-      this.registerPasswort
-    );
-
-    if (erfolg) {
-      this.fehlermeldung = '';
-      this.zeigeRegister = false;
-    } else {
-      this.fehlermeldung = 'Registrierung fehlgeschlagen.';
+  async anmelden() {
+    try {
+      if (this.benutzername && this.passwort) {
+        const result = await firstValueFrom(this.authService.login(this.benutzername, this.passwort));
+        console.log("Login erfolgreich", result);
+        this.router.navigate(["/account"]);
+      }
+    } catch (err: any) {
+      console.error("Login fehlgeschlagen:", err);
     }
   }
 
 
 }
-
-
-
-//import { Component } from '@angular/core';
-//@Component({
-//  selector: 'app-login-component',
-//  imports: [],
-//  templateUrl: './login-component.html',
-//  styleUrl: './login-component.css',
-//})
-//export class LoginComponent {
-//}

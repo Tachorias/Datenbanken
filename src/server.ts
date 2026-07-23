@@ -5,12 +5,27 @@ import {
   writeResponseToNodeResponse,
 } from '@angular/ssr/node';
 import express from 'express';
+import session from 'express-session';
 import { join } from 'node:path';
 import {createConnection} from 'mysql2';
 
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
 const app = express();
+
+app.use(express.json());
+
+app.use(session({
+  secret: 'filmwebsite-secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,
+    secure: false,
+    maxAge: 1000*60*60*24
+  }
+}));
+
 const angularApp = new AngularNodeAppEngine();
 var con = createConnection({
   host: "192.168.110.94",
@@ -74,15 +89,86 @@ app.get('/api/movies/:id', (req, res) => {
   })
 })
 
-app.get('/api/login/:username/:password', (req, res) => {
-  con.query('SELECT * FROM Benutzer WHERE Benutzername = ? AND Passwort = ?', [req.params.username, req.params.password], (err, result) => {
-    if (err) {
-      res.status(500).send('Benutzername oder Passwort Falsch!');
-    } else {
-      res.json(result);
+app.post('/api/login', (req, res) => {
+  const username = req.body.username;
+  const password = req.body.password;
+  con.query(
+    'SELECT * FROM Benutzer WHERE Nutzername = ? AND Passwort = ?',
+    [username, password],
+    (err, result:any)=>{
+
+      if(err){
+        res.status(500).send('Fehler beim Login');
+        console.log(err);
+
+      } else {
+        if(result.length > 0){
+          const user = result[0];
+          req.session.username = user['Nutzername'];
+          req.session.password = user['Passwort'];
+          res.json(result[0]);
+          console.log(result[0]);
+
+        } else {
+          res.status(401).send('Falsche Daten');
+
+        }
+      }
     }
-  })
+  );
+});
+
+app.get('/api/user',(req,res)=>{
+
+  if(req.session.username){
+
+    res.json({
+      Nutzername: req.session.username
+    });
+
+  }else{
+
+    res.status(401).send('Nicht eingeloggt');
+
+  }
+
+});
+
+app.post('/api/logout',(req,res)=>{
+
+  req.session.destroy(()=>{
+
+    res.json({
+      message:'Logout erfolgreich'
+    });
+
+  });
+
+});
+
+app.post('/api/register', (req, res) => {
+  const username = req.body.username;
+  const password = req.body.password;
+
+  con.query(
+    'INSERT INTO Benutzer (Nutzername, Passwort) VALUES (?, ?)',
+    [username, password],
+    (err, result) => {
+
+      if (err) {
+        res.status(500).send('Fehler beim Speichern des Benutzers');
+
+      } else {
+        res.json({
+          message: 'Registrierung erfolgreich'
+        });
+
+      }
+    }
+  );
 })
+
+
 
 app.use(
   express.static(browserDistFolder, {

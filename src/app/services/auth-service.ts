@@ -1,85 +1,60 @@
-import { Injectable } from '@angular/core';
-
-interface User {
-  username: string;
-  password: string;
-}
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
 
-  private speicherSchluessel = 'token';
-  private userKey = 'users';
+  private http = inject(HttpClient);
 
-  // 🧠 lädt User aus localStorage
-  private getUsers(): User[] {
-    const data = localStorage.getItem(this.userKey);
-    return data ? JSON.parse(data) : [];
-  }
 
-  // 💾 speichert User in localStorage
-  private saveUsers(users: User[]): void {
-    localStorage.setItem(this.userKey, JSON.stringify(users));
-  }
-
-  login(benutzername: string, passwort: string): boolean {
-    const users = this.getUsers();
-
-    const cleanUsername = benutzername.trim();
-    const cleanPassword = passwort.trim();
-
-    const user = users.find(
-      u =>
-        u.username.toLowerCase() === cleanUsername.toLowerCase() &&
-        u.password === cleanPassword
+  login(username: string, password: string) {
+    return this.http.post<any>(
+      'api/login',
+      {
+        username,
+        password
+      },
+      {
+        withCredentials: true
+      }
     );
 
-    if (user) {
-      localStorage.setItem(this.speicherSchluessel, cleanUsername);
-      return true;
-    }
-
-    return false;
   }
 
-  register(benutzername: string, passwort: string): boolean {
-    const users = this.getUsers();
 
-    const cleanUsername = benutzername.trim();
-    const cleanPassword = passwort.trim();
+  getAktuellerUser(){
 
-    if (!cleanUsername || !cleanPassword) return false;
-
-    const exists = users.find(
-      u => u.username.toLowerCase() === cleanUsername.toLowerCase()
+    return this.http.get<any>(
+      '/api/user',
+      {
+        withCredentials: true
+      }
     );
 
-    if (exists) return false;
+  }
 
-    users.push({
-      username: cleanUsername,
-      password: cleanPassword
+
+  logout(){
+
+    return this.http.post(
+      '/api/logout',
+      {},
+      {
+        withCredentials: true
+      }
+    );
+
+  }
+
+  register(username: string, password: string) {
+
+    return this.http.post<any>('/api/register', {
+      username,
+      password
     });
 
-    this.saveUsers(users);
-    return true;
   }
 
-
-  // 👀 prüfen ob eingeloggt
-  isLoggedIn(): boolean {
-    return !!localStorage.getItem(this.speicherSchluessel);
-  }
-
-  // 🚪 logout
-  logout(): void {
-    localStorage.removeItem(this.speicherSchluessel);
-  }
-
-  // 👤 aktueller User
-  getUser(): string | null {
-    return localStorage.getItem(this.speicherSchluessel);
-  }
 }

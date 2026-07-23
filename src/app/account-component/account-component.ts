@@ -11,22 +11,44 @@ export class AccountComponent implements OnInit {
 
   benutzername: string | null = null;
 
+
   constructor(
     private authService: AuthService,
     private router: Router
   ) {}
 
-  ngOnInit(): void {
-    if (!this.authService.isLoggedIn()) {
-      this.router.navigate(['/login']);
-      return;
-    }
 
-    this.benutzername = this.authService.getUser();
+  ngOnInit(): void {
+
+    this.authService.getAktuellerUser()
+      .subscribe({
+
+        next: (user) => {
+
+          this.benutzername = user.Benutzername;
+
+        },
+
+        error: () => {
+
+          this.router.navigate(['/login']);
+
+        }
+
+      });
+
   }
+
 
   abmelden(): void {
-    this.authService.logout();
-    this.router.navigate(['/login']);
+
+    this.authService.logout()
+      .subscribe(() => {
+
+        this.router.navigate(['/login']);
+
+      });
+
   }
+
 }
