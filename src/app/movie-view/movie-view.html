@@ -1,29 +1,26 @@
-<div>
-  <style>
-    .movie-container { width: 100%; max-width: 1440px; margin: 1% auto; display: flex; gap: 3rem; align-items: flex-start; justify-content: flex-start; }
-    .video-section { flex: 3; }
-    .video-section video { width: 100%; height: auto; display: block; }
-    .content-section { flex: 1; }
-    .movie-title { text-align: left; margin: 0 0 1rem 0; }
-    .movie-description { text-align: left; }
-  </style>
+@if (movie$ | async; as movie) {
+  <div>
 
-  <div class="movie-container">
-    @if (movie$ | async; as movie) {
-      <div class="video-section">
-        <video controls>
-          <source src="assets/filme/{{ movie.idFilme }}.mp4" type="video/mp4" />
-          Your browser does not support the video tag.
-        </video>
-      </div>
+    <div class="w-full max-w-screen-xl mx-auto my-4 flex gap-12 items-start justify-start">
+        <div class="w-3/4 flex flex-col gap-4">
+          <div class="w-full">
+            <video controls class="w-full h-auto block">
+              <source src="assets/filme/{{ movie.idFilme }}.mp4" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          </div>
 
-      <div class="content-section">
-        <h1 class="movie-title bold text-6xl">{{ movie.Titel }}</h1>
-        <p class="movie-description text-xl">{{ movie.Beschreibung }}</p>
+          <div class="w-full">
+            <p class="text-6xl font-bold text-left">{{ movie.Titel }}</p>
+            <p class="text-sm text-left italic ml-2">von Produzent hochgeladen am {{movie.UploadDatum | date:'dd.MM.yyyy'}}</p>
+            <p class="text-xl text-left mt-2">{{ movie.Beschreibung }}</p>
+          </div>
+        </div>
+
+        <div class="w-1/4">
+          <app-comment-grid-component [idFilm]="movie.idFilme"></app-comment-grid-component>
+        </div>
+
       </div>
-    }
-    </div>
-</div>
-<div>
-  <app-comment-grid-component></app-comment-grid-component>
-</div>
+  </div>
+}

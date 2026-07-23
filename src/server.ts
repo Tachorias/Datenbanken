@@ -69,7 +69,16 @@ app.get('/api/movies/search/:id', (req, res) => {
     if (err) {
       res.status(500).send('Error fetching movie');
     } else {
-      // return the single movie object instead of an array
+      res.json(result);
+    }
+  })
+})
+
+app.get('/api/movies/kommentare/:id', (req, res) => {
+  con.query('SELECT * FROM Kommentar WHERE idFilm = ? ' , [req.params.id] , (err, result) => {
+    if (err) {
+      res.status(500).send('Error fetching comments');
+    } else {
       res.json(result);
     }
   })

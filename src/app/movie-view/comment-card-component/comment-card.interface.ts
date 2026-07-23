@@ -1,5 +1,5 @@
 export interface CommentCardInterface {
-  verfasser: string;
-  inhalt: string;
-  datum: string;
+  Verfasser: string;
+  Inhalt: string;
+  Datum: string;
 }
