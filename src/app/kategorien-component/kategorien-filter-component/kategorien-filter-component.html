@@ -1,0 +1,47 @@
+<aside class="w-72 bg-white rounded-xl shadow-lg p-6 h-fit">
+
+  <h2 class="text-2xl font-bold mb-6">Filter</h2>
+
+  <p class="font-bold mb-3">Upload-Datum</p>
+
+  <!--// Sortiert und filtert nach Kategorien-->
+  <div class="flex items-center gap-3 text-sm font-bold mb-6">
+    <span>Neueste</span>
+    <input
+      class="flex-1"
+      type="range"
+      min="0"
+      max="1"
+      step="1"
+      [value]="sliderWert"
+      (input)="sortierungAendern($event)"
+    >
+    <span>Älteste</span>
+  </div>
+
+  <p class="font-bold mb-3">Kategorien</p>
+
+  @if (kategorien$ | async; as kategorien) {
+    <div class="flex flex-wrap gap-2">
+      @for (
+        kategorie of kategorien;
+        track kategorie.idKategorie
+        ) {
+        <button
+          type="button"
+          class="px-2 py-1 rounded-lg text-sm font-bold bg-gray-200 text-black hover:bg-gray-400 transition"
+          [class.bg-gray-600]="istAusgewaehlt(kategorie.idKategorie)"
+          [class.text-white]="istAusgewaehlt(kategorie.idKategorie)"
+          (click)="kategorieUmschalten(kategorie.idKategorie)"
+        >
+          {{ kategorie.Name }}
+        </button>
+      }
+    </div>
+  } @else {
+    <p class="text-gray-500">
+      Kategorien werden geladen.
+    </p>
+  }
+
+</aside>

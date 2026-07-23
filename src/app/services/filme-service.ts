@@ -19,5 +19,23 @@ export class FilmeService {
     return this.http.get(`/api/movies/${id}`);
   }
 
+// Welche Datei meinst du genau
+  getFilmeNachKategorien(
+    kategorieIds: number[],
+    sortierung: string,
+    suchtext: string
+  ): Observable<MovieCardInterface[]> {
+    return this.http.get<MovieCardInterface[]>(
+      '/api/movies/filter/kategorien',
+      {
+        params: {
+          ids: kategorieIds.join(','),
+          sortierung: sortierung,
+          suche: suchtext,
+        }
+      }
+    );
+  }
+
 }
 

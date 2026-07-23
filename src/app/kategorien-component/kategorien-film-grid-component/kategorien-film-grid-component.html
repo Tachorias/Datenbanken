@@ -1,0 +1,34 @@
+<section class="flex-1 min-w-0">
+
+  <div class="pr-4">
+
+    <!--// Bindet Suchleiste und Suchtext-->
+    <app-kategorien-suchleiste-component
+      [suchtext]="suchtext"
+      (suchtextChange)="suchtextAendern($event)"
+    ></app-kategorien-suchleiste-component>
+
+    <h2 class="text-2xl font-bold mb-4">Filme</h2>
+
+    <!--// Zeigt Filme oder Fehlermeldung-->
+    @if (filme$ | async; as filme) {
+
+      <div class="grid grid-cols-3 gap-6">
+        @for (film of filme; track film.idFilme) {
+          <app-kategorien-film-card-component
+            [film]="film"
+          ></app-kategorien-film-card-component>
+        }
+      </div>
+
+      @if (filme.length === 0) {
+        <p class="mt-6 font-bold">
+          Keine Filme gefunden.
+        </p>
+      }
+
+    }
+
+  </div>
+
+</section>
