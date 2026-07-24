@@ -65,9 +65,7 @@ app.get('/api/movies/filter/kategorien', (req, res) => {
     .filter(id => id > 0);
 
   let sql = `
-    SELECT f.*
-    FROM Filme f
-    WHERE (
+    SELECT f.* FROM Filme f WHERE (
       ? = ''
       OR LOWER(f.Titel) LIKE LOWER(?)
       OR EXISTS (
@@ -205,6 +203,35 @@ app.get('/api/movies/search/:id', (req, res) => {
     }
   })
 })
+
+app.post("/api/movies/kommentar", (req, res) => {
+
+  const { idFilm, Inhalt } = req.body;
+  console.log(req.body);
+
+  const sql = `
+        INSERT INTO Kommentar (idFilm, Verfasser, Inhalt, Datum)
+        VALUES (?, ?, ?, NOW())
+    `;
+  const nutzer = req.session.username;
+
+  con.query(sql, [idFilm, nutzer, Inhalt], (err, result) => {
+
+    if (err) {
+      console.error(err);
+      res.status(500).json({
+        message: "Fehler beim Speichern"
+      });
+      return;
+    }
+
+    res.status(201).json({
+      message: "Kommentar gespeichert"
+    });
+
+  });
+
+});
 
 app.get('/api/movies/kommentare/:id', (req, res) => {
   con.query('SELECT * FROM Kommentar WHERE idFilm = ? ORDER BY Datum DESC' , [req.params.id] , (err, result) => {
