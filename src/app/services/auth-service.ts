@@ -78,13 +78,26 @@ export class AuthService {
     );
   }
 
-  register(username: string, password: string) {
+  register(
+    username: string,
+    password: string,
+    rolle: string,
+    anzeigename: string,
+    studiengang: string,
+    email: string
+  ) {
+
     return this.http.post<any>(
       '/api/register',
       {
         username,
-        password
+        password,
+        rolle,
+        anzeigename,
+        studiengang,
+        email
       }
     );
+
   }
 }

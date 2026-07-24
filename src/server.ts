@@ -300,26 +300,125 @@ app.post('/api/logout',(req,res)=>{
 });
 
 app.post('/api/register', async (req, res) => {
+
   const username = req.body.username;
   const password = req.body.password;
 
+  const rolle = req.body.rolle;
+  const anzeigename = req.body.anzeigename;
+  const studiengang = req.body.studiengang;
+  const email = req.body.email;
+
+  if (!username || !password) {
+    res.status(400).json({
+      message: 'Bitte Benutzername und Passwort angeben.'
+    });
+    return;
+  }
+
+  if (rolle === 'produzent') {
+    if (!anzeigename || !studiengang || !email) {
+      res.status(400).json({
+        message: 'Bitte alle Produzentendaten ausfüllen.'
+      });
+      return;
+    }
+  }
+
   try {
+
     const hashedPassword = await bcrypt.hash(password, 10);
-    con.query(
-      'INSERT INTO Benutzer (Nutzername, Passwort) VALUES (?, ?)',
-      [username, hashedPassword],
-      (err) => {
-        if (err) {
-          res.status(500).send('Fehler beim Speichern des Benutzers');
-        } else {
-          res.json({
-            message: 'Registrierung erfolgreich'
-          });
-        }
+
+    con.beginTransaction((err) => {
+
+      if (err) {
+        console.error(err);
+        res.status(500).json({
+          message: 'Fehler beim Starten der Transaktion.'
+        });
+        return;
       }
-    );
-  } catch {
-    res.status(500).send('Fehler beim Hashen des Passworts');
+
+      // Benutzer speichern
+      con.query(
+        'INSERT INTO Benutzer (Nutzername, Passwort) VALUES (?, ?)',
+        [username, hashedPassword],
+        (err) => {
+
+          if (err) {
+            return con.rollback(() => {
+              console.error(err);
+              res.status(500).json({
+                message: 'Benutzername existiert bereits.'
+              });
+            });
+          }
+
+          // Normaler Nutzer
+          if (rolle !== 'produzent') {
+
+            return con.commit((err) => {
+
+              if (err) {
+                return con.rollback(() => {
+                  console.error(err);
+                  res.status(500).json({
+                    message: 'Fehler beim Speichern.'
+                  });
+                });
+              }
+              res.json({
+                message: 'Registrierung erfolgreich.'
+              });
+            });
+          }
+
+          // Produzent speichern
+          con.query(
+            `INSERT INTO Produzenten
+            (Nutzername, Anzeigename, Studiengang, Email)
+            VALUES (?, ?, ?, ?)`,
+            [
+              username,
+              anzeigename,
+              studiengang,
+              email
+            ],
+            (err) => {
+
+              if (err) {
+                return con.rollback(() => {
+                  console.error(err);
+                  res.status(500).json({
+                    message: 'Produzent konnte nicht gespeichert werden.'
+                  });
+                });
+              }
+              con.commit((err) => {
+
+                if (err) {
+                  return con.rollback(() => {
+                    console.error(err);
+                    res.status(500).json({
+                      message: 'Fehler beim Abschließen der Registrierung.'
+                    });
+                  });
+                }
+                res.json({
+                  message: 'Produzent erfolgreich registriert.'
+                });
+              });
+            }
+          );
+        }
+      );
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: 'Fehler beim Hashen des Passworts.'
+    });
   }
 });
 
