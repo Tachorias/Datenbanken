@@ -22,10 +22,6 @@ export class FilmeService {
       .pipe(map(movies => movies[0]));
   }
 
-  getKommentare(id: number): Observable<CommentCardInterface[]> {
-    return this.http.get<CommentCardInterface[]>(`/api/movies/kommentare/${id}`);
-  }
-
 // Welche Datei meinst du genau
   getFilmeNachKategorien(
     kategorieIds: number[],
@@ -42,6 +38,10 @@ export class FilmeService {
         }
       }
     );
+  }
+
+  updateLikes(filmId: number, likes: number): Observable<any> {
+    return this.http.put(`/api/movies/${filmId}/likes`, { likes });
   }
 
 }

@@ -35,4 +35,15 @@ export class MovieView implements OnInit {
     this.movie$ = this.filmeService.getFilm(id);
     this.movie$.subscribe(movie => console.log(movie));
   }
+
+  likeMovie(movie: MovieCardInterface): void {
+    if (movie.Likes === undefined) {
+      movie.Likes = 0;
+    }
+    movie.Likes++;
+    this.filmeService.updateLikes(movie.idFilme, movie.Likes).subscribe(
+      () => console.log('Like erfolgreich gespeichert'),
+      error => console.error('Fehler beim Speichern des Likes', error)
+    );
+  }
 }

@@ -8,7 +8,7 @@ import express from 'express';
 import session from 'express-session';
 import { join } from 'node:path';
 import { createConnection, ResultSetHeader } from 'mysql2';
-import { mkdirSync, renameSync } from 'node:fs';
+import { renameSync } from 'node:fs';
 import multer from 'multer';
 import bcrypt from 'bcryptjs';
 
@@ -195,14 +195,22 @@ app.get('/api/movies/aufrufe', (req, res) => {
 })
 
 app.get('/api/movies/search/:id', (req, res) => {
-  con.query('SELECT * FROM Filme WHERE idFilme = ? ' , [req.params.id] , (err, result) => {
+  const sql = `SELECT f.*,COUNT(l.Nutzer) AS Likes
+    FROM Filme f LEFT JOIN Likes l
+    ON f.idFilme = l.idFilm
+    WHERE f.idFilme = ?
+    GROUP BY f.idFilme
+  `;
+
+  con.query(sql, [req.params.id], (err, result) => {
     if (err) {
       res.status(500).send('Error fetching movie');
-    } else {
-      res.json(result);
+      return;
     }
-  })
-})
+
+    res.json(result);
+  });
+});
 
 app.post("/api/movies/kommentar", (req, res) => {
 
