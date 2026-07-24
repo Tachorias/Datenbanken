@@ -9,7 +9,7 @@
       <div class="hidden md:flex space-x-8 ml-auto">
         <a class="hover:text-blue-500 transition" routerLink="/home" routerLinkActive="text-white border-b-2">Home</a>
         <a class="hover:text-blue-500 transition" routerLink="/kategorien" routerLinkActive="text-white border-b-2">Kategorien</a>
-        @if (authService.isLoggedIn()) {
+        @if (authService.istProduzent()) {
           <a class="hover:text-blue-500 transition" routerLink="/upload" routerLinkActive="text-white border-b-2">Upload</a>
         }
         @if (!authService.isLoggedIn()){

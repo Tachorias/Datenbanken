@@ -263,10 +263,21 @@ app.post('/api/login', (req, res) => {
 
       req.session.username = user.Nutzername;
 
-      res.json({
-        message: 'Login erfolgreich',
-        username: user.Nutzername
-      });
+      con.query(
+        'SELECT * FROM Produzenten WHERE Nutzername = ?',
+        [user.Nutzername],
+        (err, result:any)=>{
+
+          res.json({
+
+            message:'Login erfolgreich',
+            username:user.Nutzername,
+            istProduzent: result.length > 0
+
+          });
+
+        }
+      );
 
     }
   );
@@ -276,15 +287,72 @@ app.get('/api/user',(req,res)=>{
 
   if(req.session.username){
 
-    res.json({
-      username: req.session.username
-    });
+    con.query(
+      'SELECT * FROM Produzenten WHERE Nutzername = ?',
+      [req.session.username],
+      (err,result:any)=>{
 
-  }else{
+        if(err){
+          res.status(500).send();
+          return;
+        }
+
+
+        res.json({
+          username: req.session.username,
+          istProduzent: result.length > 0
+        });
+
+      }
+    );
+
+
+  } else {
+
     res.status(401).send('Nicht eingeloggt');
 
   }
 
+});
+
+app.get('/api/produzent', (req, res) => {
+  if (!req.session.username) {
+    res.status(401).json({
+      message: 'Nicht eingeloggt'
+    });
+    return;
+  }
+  con.query(
+    `
+    SELECT * FROM Produzenten WHERE Nutzername = ?`,
+    [req.session.username],
+    (err, result:any) => {
+
+      if (err) {
+        console.error(err);
+
+        res.status(500).json({
+          message:'Fehler beim Laden der Produzentendaten'
+        });
+        return;
+      }
+      if (result.length === 0) {
+
+        res.json({
+          istProduzent:false
+        });
+
+        return;
+      }
+      const produzent = result[0];
+      res.json({
+        istProduzent:true,
+        anzeigename: produzent.Anzeigename,
+        studiengang: produzent.Studiengang,
+        email: produzent.Email
+      });
+    }
+  );
 });
 
 app.post('/api/logout',(req,res)=>{
