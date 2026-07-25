@@ -1,4 +1,9 @@
 <div class="mb-6">
+  @if (authService.isLoggedIn()) {
+    <app-movie-row
+      [daten]="{kategorie:'Von mir gelikte Filme: ', sortierung:'meineLikes'}">
+    </app-movie-row>
+  }
   <app-movie-row [daten]="{kategorie:'Am besten bewertet:', sortierung:'likes'}"></app-movie-row>
   <app-movie-row [daten]="{kategorie:'Am meisten gesehen:', sortierung:'aufrufe'}"></app-movie-row>
 </div>

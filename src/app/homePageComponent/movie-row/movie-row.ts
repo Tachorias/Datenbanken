@@ -36,6 +36,8 @@ export class MovieRow implements OnChanges, OnDestroy {
     if (!this.daten) return;
     if (this.daten.sortierung === 'meine') {
       this.movies$ = this.filmService.getMeineFilme();
+    } else if (this.daten.sortierung === 'meineLikes') {
+      this.movies$ = this.filmService.getMeineLikes();
     } else {
       this.movies$ = this.filmService.getFilmeSortiert(this.daten.sortierung);
     }

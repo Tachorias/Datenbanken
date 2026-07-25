@@ -56,6 +56,10 @@ export class FilmeService {
     return this.http.delete(`/api/movies/removeLike/${idFilm}/${nutzer}`);
   }
 
+  getMeineLikes(): Observable<MovieCardInterface[]> {
+    return this.http.get<MovieCardInterface[]>('/api/movies/meineLikes');
+  }
+
   hasUserLikedFilm(idFilm: number, nutzer: string): Observable<LikeInterface> {
     return this.http.get<{ anzahl_likes: number }[]>(`/api/movies/likes/${idFilm}/${nutzer}`).pipe(
       map(response => ({ isLiked: response[0].anzahl_likes == 1 }))

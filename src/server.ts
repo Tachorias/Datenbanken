@@ -275,7 +275,33 @@ app.post('/api/movies/addAufruf/:idFilm', (req, res) => {
   );
 });
 
+app.get('/api/movies/meineLikes', (req, res) => {
 
+  if (!req.session.username) {
+    res.status(401).send('Nicht eingeloggt');
+    return;
+  }
+
+  con.query(
+    `
+    SELECT f.*
+    FROM Filme f
+    JOIN Likes l
+      ON l.idFilm = f.idFilme
+    WHERE l.Nutzer = ?
+    ORDER BY f.UploadDatum DESC
+    `,
+    [req.session.username],
+    (err, result) => {
+      if (err) {
+        res.status(500).send('Fehler');
+        return;
+      }
+
+      res.json(result);
+    }
+  );
+});
 
 app.post("/api/movies/kommentar", (req, res) => {
 

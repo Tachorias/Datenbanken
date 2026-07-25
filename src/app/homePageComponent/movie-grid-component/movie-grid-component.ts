@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { MovieRow } from '../movie-row/movie-row';
+import { AuthService } from '../../services/auth-service';
 
 @Component({
   selector: 'app-movie-grid-component',
@@ -7,4 +8,6 @@ import { MovieRow } from '../movie-row/movie-row';
   templateUrl: './movie-grid-component.html',
   styleUrl: './movie-grid-component.css',
 })
-export class MovieGridComponent {}
+export class MovieGridComponent {
+  constructor(public authService: AuthService) {}
+}
