@@ -24,7 +24,7 @@
             <div class="text-center">
               @if (this.authService.isLoggedIn()){
                 @if (isLiked$ | async; as isLiked) {
-                  @if (isLiked) {
+                  @if (isLiked.isLiked) {
                   <button (click)="likeMovie(movie)" class="flex flex-col items-center gap-1 p-2 rounded bg-red-500 hover:bg-gray-100 transition cursor-pointer">
                     <span class="text-2xl">❤️</span>
                     <p class="text-lg font-semibold">{{ movie.Likes || 0 }}</p>

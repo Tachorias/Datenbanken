@@ -2,11 +2,11 @@ import { Component, effect, inject, OnInit } from '@angular/core';
 import {AsyncPipe, DatePipe} from '@angular/common';
 import { MovieCardInterface } from '../homePageComponent/movie-card/movie-card.interface';
 import {CommentGridComponent} from './comment-grid-component/comment-grid-component';
-import {ActivatedRoute, ActivatedRouteSnapshot} from '@angular/router';
+import {ActivatedRoute} from '@angular/router';
 import { FilmeService } from '../services/filme-service';
-import { filter, Observable, of, switchMap } from 'rxjs';
+import {  Observable} from 'rxjs';
 import { AuthService } from '../services/auth-service';
-import { toObservable } from '@angular/core/rxjs-interop';
+import { LikeInterface } from './like.interface';
 
 @Component({
   selector: 'app-movie-view',
@@ -20,7 +20,7 @@ export class MovieView implements OnInit {
   movie$!: Observable<MovieCardInterface>;
   private filmeService= inject(FilmeService);
   public authService= inject(AuthService);
-  isLiked$!: Observable<boolean>;
+  isLiked$!: Observable<LikeInterface>;
 
 
   constructor() {
@@ -36,6 +36,7 @@ export class MovieView implements OnInit {
         id,
         this.authService.currentUsername()!
       );
+      console.log(this.isLiked$);
     });
   }
 

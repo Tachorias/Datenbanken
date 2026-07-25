@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {MovieCardInterface} from '../homePageComponent/movie-card/movie-card.interface';
 import { map, Observable } from 'rxjs';
+import { LikeInterface } from '../movie-view/like.interface';
 
 @Injectable({providedIn: 'root'})
 export class FilmeService {
@@ -47,9 +48,9 @@ export class FilmeService {
     return this.http.delete(`/api/movies/${idFilm}/like/${nutzer}`);
   }
 
-  hasUserLikedFilm(idFilm: number, nutzer: string): Observable<boolean> {
+  hasUserLikedFilm(idFilm: number, nutzer: string): Observable<LikeInterface> {
     return this.http.get<{ anzahl_likes: number }>(`/api/movies/likes/${idFilm}/${nutzer}`).pipe(
-      map(response => response.anzahl_likes > 0)
+      map(response => ({ isLiked: response.anzahl_likes > 0 }))
     );
   }
 }
