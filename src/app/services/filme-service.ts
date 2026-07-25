@@ -44,6 +44,9 @@ export class FilmeService {
       }
     );
   }
+  addAufruf(idFilm: number): Observable<any> {
+    return this.http.post(`/api/movies/addAufruf/${idFilm}`, {});
+  }
 
   addLike(idFilm: number, nutzer: string): Observable<any> {
     return this.http.post(`/api/movies/addLike/${idFilm}/${nutzer}`, {nutzer});

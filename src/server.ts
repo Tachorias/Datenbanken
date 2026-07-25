@@ -253,6 +253,28 @@ app.get('/api/movies/aufrufe', (req, res) => {
   });
 })
 
+app.post('/api/movies/addAufruf/:idFilm', (req, res) => {
+  console.log("POST angekommen");
+
+  const { idFilm } = req.params;
+
+  con.query(
+    'UPDATE Filme SET Aufrufe = Aufrufe + 1 WHERE idFilme = ?',
+    [idFilm],
+    (err, result) => {
+      console.log("UPDATE ausgeführt, affectedRows:");
+
+      if (err) {
+        console.log(err);
+        res.status(500).send('Error');
+        return;
+      }
+
+      res.json(result);
+    }
+  );
+});
+
 
 
 app.post("/api/movies/kommentar", (req, res) => {
