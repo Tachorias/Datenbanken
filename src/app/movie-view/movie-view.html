@@ -17,15 +17,26 @@
               <p class="text-6xl font-bold text-left">{{ movie.Titel }}</p>
               <p class="text-sm text-left italic ml-2">von Produzent hochgeladen am {{movie.UploadDatum | date:'dd.MM.yyyy'}}</p>
             </div>
-            <div class="flex flex-col items-center gap-1 p-2">
+            <div class="flex flex-col items-center gap-1 p-2 cursor-normal">
               <span class="text-2xl">👁️</span>
               <p class="text-lg font-semibold">{{ movie.Aufrufe }}</p>
             </div>
             <div class="text-center">
-              <button (click)="likeMovie(movie)" class="flex flex-col items-center gap-1 p-2 rounded hover:bg-gray-100 transition cursor-pointer">
-                <span class="text-2xl">👍</span>
-                <p class="text-lg font-semibold">{{ movie.Likes || 0 }}</p>
-              </button>
+              @if (this.authService.isLoggedIn()){
+                @if (isLiked$ | async; as isLiked) {
+                  @if (isLiked) {
+                  <button (click)="likeMovie(movie)" class="flex flex-col items-center gap-1 p-2 rounded bg-red-500 hover:bg-gray-100 transition cursor-pointer">
+                    <span class="text-2xl">❤️</span>
+                    <p class="text-lg font-semibold">{{ movie.Likes || 0 }}</p>
+                  </button>
+                  }
+                }
+              }@else{
+                <button class="flex flex-col items-center gap-1 p-2 rounded transition">
+                    <span class="text-2xl">❤️</span>
+                    <p class="text-lg font-semibold">{{ movie.Likes || 0 }}</p>
+                  </button>
+              }
             </div>
           </div>
 

@@ -1,10 +1,12 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, effect, inject, OnInit } from '@angular/core';
 import {AsyncPipe, DatePipe} from '@angular/common';
 import { MovieCardInterface } from '../homePageComponent/movie-card/movie-card.interface';
 import {CommentGridComponent} from './comment-grid-component/comment-grid-component';
 import {ActivatedRoute, ActivatedRouteSnapshot} from '@angular/router';
 import { FilmeService } from '../services/filme-service';
-import { Observable } from 'rxjs';
+import { filter, Observable, of, switchMap } from 'rxjs';
+import { AuthService } from '../services/auth-service';
+import { toObservable } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-movie-view',
@@ -16,16 +18,24 @@ export class MovieView implements OnInit {
   readonly movieURL: string;
   private route = inject(ActivatedRoute);
   movie$!: Observable<MovieCardInterface>;
-  private filmeService: FilmeService;
+  private filmeService= inject(FilmeService);
+  public authService= inject(AuthService);
+  isLiked$!: Observable<boolean>;
+
 
   constructor() {
-    this.filmeService = inject(FilmeService);
     this.movieURL = this.route.snapshot.paramMap.get('id') || '';
-    const snapshot = this.route.snapshot;
-    console.log({
-      url: snapshot.url, // https://www.angular.dev
-      params: snapshot.params,
-      queryParams: snapshot.queryParams, // Query parameters
+    effect(() => {
+      if (!this.authService.isLoggedIn()) {
+        return;
+      }
+      console.log("Benutzer ist eingeloggt:", this.authService.currentUsername());
+
+      const id = Number(this.route.snapshot.paramMap.get('id'));
+      this.isLiked$ = this.filmeService.hasUserLikedFilm(
+        id,
+        this.authService.currentUsername()!
+      );
     });
   }
 
@@ -34,16 +44,17 @@ export class MovieView implements OnInit {
     const id = Number(this.route.snapshot.paramMap.get('id'));
     this.movie$ = this.filmeService.getFilm(id);
     this.movie$.subscribe(movie => console.log(movie));
+
   }
 
   likeMovie(movie: MovieCardInterface): void {
     if (movie.Likes === undefined) {
       movie.Likes = 0;
     }
-    movie.Likes++;
-    this.filmeService.updateLikes(movie.idFilme, movie.Likes).subscribe(
-      () => console.log('Like erfolgreich gespeichert'),
-      error => console.error('Fehler beim Speichern des Likes', error)
+    this.filmeService.addLike(movie.idFilme, String(this.authService.currentUsername)).subscribe(
+      () => console.log('Like erfolgreich hinzugefügt'),
+      error => console.error('Fehler beim Hinzufügen des Likes', error)
     );
+    movie.Likes++;
   }
 }

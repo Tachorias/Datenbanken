@@ -184,6 +184,38 @@ app.get('/api/movies/likes/:id', (req, res) => {
   });
 })
 
+app.get('/api/movies/likes/:id/:nutzer', (req, res) => {
+  con.query('SELECT COUNT(*) AS anzahl_likes FROM Likes WHERE idFilm = ? AND Nutzer = ?' , [req.params.id, req.params.nutzer], (err, result) => {
+    if (err) {
+      res.status(500).send('Error fetching like count');
+    } else {
+      res.json(result);
+    }
+  });
+})
+
+app.post('/api/movies/addLike/:idFilm/:nutzer', (req, res) => {
+  const { idFilm, nutzer } = req.params;
+  con.query('INSERT INTO Likes (idFilm, Nutzer) VALUES (?, ?)', [idFilm, nutzer], (err, result) => {
+    if (err) {
+      res.status(500).send('Error adding like');
+    } else {
+      res.json(result);
+    }
+  });
+});
+
+app.delete('/api/movies/removeLike/:idFilm/:nutzer', (req, res) => {
+  const { idFilm, nutzer } = req.params;
+  con.query('DELETE FROM Likes WHERE idFilm = ? AND Nutzer = ?', [idFilm, nutzer], (err, result) => {
+    if (err) {
+      res.status(500).send('Error removing like');
+    } else {
+      res.json(result);
+    }
+  });
+});
+
 app.get('/api/movies/aufrufe', (req, res) => {
   con.query('SELECT * FROM Filme ORDER BY Aufrufe DESC ', (err, result) => {
     if (err) {
