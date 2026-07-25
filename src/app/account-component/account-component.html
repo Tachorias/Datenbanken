@@ -56,12 +56,7 @@
       @if ((produzent$ | async);as produzent) {
         @if (authService.istProduzent()){
 
-        <div class="border rounded-xl p-5 mb-6">
-
-          <h3 class="text-xl font-bold mb-4">
-            Produzentenprofil
-          </h3>
-
+        <div class="rounded-xl p-5 mb-6">
 
           <p>
             <span class="font-bold">
@@ -97,29 +92,16 @@
         }
       }
 
+      @if (authService.istProduzent()) {
 
+        <app-movie-row
+          [daten]="{
+          kategorie: 'Meine Filme',
+          sortierung: 'meine'
+        }">
+        </app-movie-row>
 
-      <!-- Funktionen -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-
-        <div class="border rounded-xl p-5">
-
-          <h3 class="text-xl font-bold mb-2">
-            Filme mit "Gefällt mir"-Markierung
-          </h3>
-
-
-          <p class="text-gray-600">
-            Deine gelikten Filme anzeigen...
-          </p>
-
-
-        </div>
-
-      </div>
-
-
+      }
 
       <!-- Logout -->
       <div class="mt-8 flex justify-end">

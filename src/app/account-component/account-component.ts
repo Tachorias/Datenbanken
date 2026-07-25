@@ -4,12 +4,13 @@ import { AuthService } from '../services/auth-service';
 import { AsyncPipe } from '@angular/common';
 import { ProduzentInterface } from './produzent.interface';
 import { Observable } from 'rxjs';
+import { MovieRow } from '../homePageComponent/movie-row/movie-row';
 
 @Component({
   selector: 'app-account-component',
   templateUrl: './account-component.html',
   styleUrl: './account-component.css',
-  imports: [AsyncPipe, RouterLink, RouterLinkActive],
+  imports: [AsyncPipe, RouterLink, RouterLinkActive, MovieRow],
 })
 export class AccountComponent implements OnInit {
   produzent$!: Observable<ProduzentInterface>;

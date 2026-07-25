@@ -490,12 +490,40 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
+app.get('/api/movies/meine', (req, res) => {
 
+  if (!req.session.username) {
+    res.status(401).send('Nicht eingeloggt');
+    return;
+  }
+
+  con.query(
+    `
+    SELECT f.*
+    FROM Filme f
+    JOIN Filmverwaltung fv
+      ON fv.idFilm = f.idFilme
+    WHERE fv.Produzent = ?
+    ORDER BY f.UploadDatum DESC
+    `,
+    [req.session.username],
+    (err, result) => {
+
+      if (err) {
+        res.status(500).send('Fehler');
+        return;
+      }
+
+      res.json(result);
+
+    }
+  );
+
+});
 
 
 /*// Titel und Beschreibung aus dem Formular lesen, Film in Datenbank anlegen, neue FilmID erstellen = Cover(jpeg) und Film(mp4)*/
-app.post(
-  '/api/movies',
+app.post('/api/movies',
   upload.fields([
     { name: 'cover', maxCount: 1 },
     { name: 'film', maxCount: 1 },
@@ -542,7 +570,15 @@ app.post(
             join(filmOrdner, `${filmId}.mp4`)
           );
         }
-
+        con.query(
+          'INSERT INTO Filmverwaltung (idFilm, Produzent) VALUES (?, ?)',
+          [filmId, req.session.username],
+          (err) => {
+            if (err) {
+              console.error(err);
+            }
+          }
+        );
         const kategorien = JSON.parse(req.body.kategorien || '[]') as number[];
 
         if (kategorien.length > 0) {

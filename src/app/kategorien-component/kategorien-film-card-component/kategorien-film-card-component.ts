@@ -15,7 +15,7 @@ export class KategorienFilmCardComponent {
   @Input() film!: KategorienFilmInterface;
   constructor(private router: Router) {}
   openMovie(): void {
-    this.router.navigate(['/movie'], { state: { movie: this.film } });
+    this.router.navigate(['/movie/', this.film.idFilme], { state: { movie: this.film } });
   }
 
 }

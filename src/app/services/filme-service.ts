@@ -26,6 +26,10 @@ export class FilmeService {
     return this.http.get<CommentCardInterface[]>(`/api/movies/kommentare/${id}`);
   }
 
+  getMeineFilme(): Observable<MovieCardInterface[]> {
+    return this.http.get<MovieCardInterface[]>('/api/movies/meine');
+  }
+
 // Welche Datei meinst du genau
   getFilmeNachKategorien(
     kategorieIds: number[],
