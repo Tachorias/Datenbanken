@@ -22,7 +22,7 @@ import { KategorienSuchleisteComponent } from '../kategorien-suchleiste-componen
 export class KategorienFilmGridComponent implements OnChanges {
   @Input() sortierung = 'neu';
   @Input() ausgewaehlteKategorien: number[] = [];
-  suchtext = '';
+  @Input() suchtext = '';
   filme$!: Observable<KategorienFilmInterface[]>;
   constructor(private filmeService: FilmeService) {}
   ngOnChanges(): void {

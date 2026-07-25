@@ -2,7 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import {AsyncPipe, DatePipe} from '@angular/common';
 import { MovieCardInterface } from '../homePageComponent/movie-card/movie-card.interface';
 import {CommentGridComponent} from './comment-grid-component/comment-grid-component';
-import {ActivatedRoute, ActivatedRouteSnapshot} from '@angular/router';
+import {ActivatedRoute, ActivatedRouteSnapshot, RouterLink} from '@angular/router';
 import { FilmeService } from '../services/filme-service';
 import { Observable } from 'rxjs';
 
@@ -10,7 +10,7 @@ import { Observable } from 'rxjs';
   selector: 'app-movie-view',
   templateUrl: './movie-view.html',
   styleUrl: './movie-view.css',
-  imports: [CommentGridComponent, AsyncPipe, DatePipe],
+  imports: [CommentGridComponent, AsyncPipe, DatePipe, RouterLink],
 })
 export class MovieView implements OnInit {
   readonly movieURL: string;

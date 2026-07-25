@@ -1,17 +1,36 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { KategorienFilterComponent } from './kategorien-filter-component/kategorien-filter-component';
 import { KategorienFilmGridComponent } from './kategorien-film-grid-component/kategorien-film-grid-component';
+import {KategorienSuchleisteComponent} from './kategorien-suchleiste-component/kategorien-suchleiste-component';
 
-/*// Konfiguriert die K-Hauptkomponente*/
 @Component({
   selector: 'app-kategorien-component',
-  imports: [KategorienFilterComponent, KategorienFilmGridComponent],
+  imports: [
+    KategorienFilterComponent,
+    KategorienFilmGridComponent,
+  ],
   templateUrl: './kategorien-component.html',
   styleUrl: './kategorien-component.css',
 })
 
-/*// Speichert Sortierung und Kategorienauswahl*/
-export class KategorienComponent {
+export class KategorienComponent implements OnInit {
+
   sortierung = 'neu';
   ausgewaehlteKategorien: number[] = [];
+
+  suchtext = '';
+
+  constructor(private route: ActivatedRoute) {}
+
+  ngOnInit() {
+
+    this.route.queryParams.subscribe(params => {
+
+      this.suchtext = params['suche'] ?? '';
+
+    });
+
+  }
+
 }

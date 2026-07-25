@@ -12,7 +12,16 @@
 
           <div class="w-full">
             <p class="text-6xl font-bold text-left">{{ movie.Titel }}</p>
-            <p class="text-sm text-left italic ml-2">von Produzent hochgeladen am {{movie.UploadDatum | date:'dd.MM.yyyy'}}</p>
+            <p class="text-sm text-left italic ml-2">
+              von
+              <a
+                [routerLink]="['/kategorien']"
+                [queryParams]="{ suche: movie.Anzeigename }"
+                class="text-blue-600 hover:underline">
+                {{ movie.Anzeigename }}
+              </a>
+              hochgeladen am {{ movie.UploadDatum | date:'dd.MM.yyyy' }}
+            </p>
             <p class="text-xl text-left mt-2">{{ movie.Beschreibung }}</p>
           </div>
         </div>

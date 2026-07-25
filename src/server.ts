@@ -197,7 +197,11 @@ app.get('/api/movies/aufrufe', (req, res) => {
 })
 
 app.get('/api/movies/search/:id', (req, res) => {
-  con.query('SELECT * FROM Filme WHERE idFilme = ? ' , [req.params.id] , (err, result) => {
+  con.query('SELECT f.*, p.Anzeigename\n' +
+    '     FROM Filme f\n' +
+    '     JOIN Filmverwaltung fv ON fv.idFilm = f.idFilme\n' +
+    '     JOIN Produzenten p ON p.Nutzername = fv.Produzent\n' +
+    '     WHERE f.idFilme = ?' , [req.params.id] , (err, result) => {
     if (err) {
       res.status(500).send('Error fetching movie');
     } else {
