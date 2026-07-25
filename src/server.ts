@@ -173,7 +173,34 @@ app.get('/api/movies/likes', (req, res) => {
     }
   });
 })
+app.get('/api/movies/search/:id', (req, res) => {
+  const sql = `
+    SELECT
+      f.*,
+      p.Anzeigename,
+      COUNT(l.Nutzer) AS Likes
+    FROM Filme f
+           LEFT JOIN Likes l
+                     ON f.idFilme = l.idFilm
+           JOIN Filmverwaltung fv
+                ON fv.idFilm = f.idFilme
+           JOIN Produzenten p
+                ON p.Nutzername = fv.Produzent
+    WHERE f.idFilme = ?
+    GROUP BY
+      f.idFilme,
+      p.Anzeigename
+  `;
 
+  con.query(sql, [req.params.id], (err, result) => {
+    if (err) {
+      res.status(500).send('Error fetching movie');
+      return;
+    }
+
+    res.json(result);
+  });
+});
 app.get('/api/movies/likes/:id', (req, res) => {
   con.query('SELECT COUNT(*) AS anzahl_likes FROM Likes WHERE idFilm = ?' , [req.params.id], (err, result) => {
     if (err) {
@@ -226,34 +253,7 @@ app.get('/api/movies/aufrufe', (req, res) => {
   });
 })
 
-app.get('/api/movies/search/:id', (req, res) => {
-  const sql = `
-    SELECT
-      f.*,
-      p.Anzeigename,
-      COUNT(l.Nutzer) AS Likes
-    FROM Filme f
-           LEFT JOIN Likes l
-                     ON f.idFilme = l.idFilm
-           JOIN Filmverwaltung fv
-                ON fv.idFilm = f.idFilme
-           JOIN Produzenten p
-                ON p.Nutzername = fv.Produzent
-    WHERE f.idFilme = ?
-    GROUP BY
-      f.idFilme,
-      p.Anzeigename
-  `;
 
-  con.query(sql, [req.params.id], (err, result) => {
-    if (err) {
-      res.status(500).send('Error fetching movie');
-      return;
-    }
-
-    res.json(result);
-  });
-});
 
 app.post("/api/movies/kommentar", (req, res) => {
 

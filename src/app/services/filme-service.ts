@@ -46,16 +46,16 @@ export class FilmeService {
   }
 
   addLike(idFilm: number, nutzer: string): Observable<any> {
-    return this.http.put(`/api/movies/${idFilm}/like/${nutzer}`, {nutzer});
+    return this.http.post(`/api/movies/addLike/${idFilm}/${nutzer}`, {nutzer});
   }
 
   removeLike(idFilm: number, nutzer: string): Observable<any> {
-    return this.http.delete(`/api/movies/${idFilm}/like/${nutzer}`);
+    return this.http.delete(`/api/movies/removeLike/${idFilm}/${nutzer}`);
   }
 
   hasUserLikedFilm(idFilm: number, nutzer: string): Observable<LikeInterface> {
-    return this.http.get<{ anzahl_likes: number }>(`/api/movies/likes/${idFilm}/${nutzer}`).pipe(
-      map(response => ({ isLiked: response.anzahl_likes > 0 }))
+    return this.http.get<{ anzahl_likes: number }[]>(`/api/movies/likes/${idFilm}/${nutzer}`).pipe(
+      map(response => ({ isLiked: response[0].anzahl_likes == 1 }))
     );
   }
 }

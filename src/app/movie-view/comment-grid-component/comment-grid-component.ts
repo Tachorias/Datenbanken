@@ -53,8 +53,7 @@ export class CommentGridComponent implements OnChanges, OnDestroy {
     if (!this.idFilm) return;
     this.kommentare$ = this.commentService.getKommentare(this.idFilm);
     this.sub?.unsubscribe();
-    this.sub = this.kommentare$.subscribe(() => {})
-    console.log(this.kommentare$);
+    this.sub = this.kommentare$.subscribe(() => {});
   }
 
   ngOnDestroy() {
