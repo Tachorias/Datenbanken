@@ -1,12 +1,14 @@
-import { Component, effect, inject, OnInit, PLATFORM_ID } from '@angular/core';
+import { Component, effect, inject, OnInit, PLATFORM_ID, DestroyRef, signal } from '@angular/core';
 import { AsyncPipe, DatePipe, isPlatformBrowser } from '@angular/common';
 import { MovieCardInterface } from '../homePageComponent/movie-card/movie-card.interface';
 import {CommentGridComponent} from './comment-grid-component/comment-grid-component';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import { FilmeService } from '../services/filme-service';
-import { Observable, switchMap } from 'rxjs';
+import { Observable } from 'rxjs';
 import { AuthService } from '../services/auth-service';
 import { LikeInterface } from './like.interface';
+import { WebSocketService } from '../services/websocket-service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-movie-view',
@@ -18,11 +20,15 @@ export class MovieView implements OnInit {
   readonly movieURL: string;
   private route = inject(ActivatedRoute);
   movie$!: Observable<MovieCardInterface>;
-  private filmeService= inject(FilmeService);
-  public authService= inject(AuthService);
+  likes = signal<number>(0);
+  aufrufe = signal<number>(0);
+  kommentare =  signal<number>(0);
+  private filmeService = inject(FilmeService);
+  public authService = inject(AuthService);
   isLiked$!: Observable<LikeInterface>;
   private platformId = inject(PLATFORM_ID);
-
+  private wsService = inject(WebSocketService);
+  private destroyRef = inject(DestroyRef);
 
   constructor() {
     this.movieURL = this.route.snapshot.paramMap.get('id') || '';
@@ -47,6 +53,30 @@ export class MovieView implements OnInit {
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
 
+    this.wsService.connect();
+
+    this.wsService.film$.pipe(
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe((msg) => {
+      const film = this.filmeService.getFilm(id);
+      switch (msg.type) {
+        case 'kommentar':
+          film.subscribe(movie => {this.kommentare.set(movie.idFilme)});
+          console.log('Neuer Kommentar empfangen:', msg.payload);
+          break;
+        case 'system':
+          console.log('Systemnachricht empfangen:', msg.payload);
+          break;
+        default:
+          console.log('Update empfangen:', msg);
+          if (msg.payload.filmId === id) {
+            console.log(id, msg.payload.filmId);
+            film.subscribe(movie => {this.likes.set(movie.Likes);this.aufrufe.set(movie.Aufrufe)});
+          }
+          break;
+      }
+    });
+
     if (isPlatformBrowser(this.platformId)) {
       this.filmeService.addAufruf(id).subscribe({
         next: () => console.log('Aufruf gespeichert'),
@@ -55,6 +85,8 @@ export class MovieView implements OnInit {
     }
 
     this.movie$ = this.filmeService.getFilm(id);
+    this.movie$.subscribe(movie => {this.likes.set(movie.Likes);this.aufrufe.set(movie.Aufrufe); this.kommentare.set(movie.idFilme)});
+    this.wsService.sendUpdate({ type: 'aufrufe', payload: { filmId: id } });
   }
 
   unlikeMovie(movie: MovieCardInterface): void {
@@ -67,6 +99,7 @@ export class MovieView implements OnInit {
       this.authService.currentUsername()!
     );
     movie.Likes--;
+    this.wsService.sendUpdate({ type: 'like', payload: { filmId: movie.idFilme } });
   }
 
   likeMovie(movie: MovieCardInterface): void {
@@ -80,5 +113,6 @@ export class MovieView implements OnInit {
       this.authService.currentUsername()!
     );
     movie.Likes++;
+    this.wsService.sendUpdate({ type: 'like', payload: { filmId: movie.idFilme } });
   }
 }

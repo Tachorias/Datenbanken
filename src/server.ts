@@ -11,6 +11,8 @@ import { createConnection, ResultSetHeader } from 'mysql2';
 import { renameSync } from 'node:fs';
 import multer from 'multer';
 import bcrypt from 'bcryptjs';
+import { SocketFilm } from './app/services/websocket-service';
+import WebSocket, { WebSocketServer } from 'ws';
 
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
@@ -33,6 +35,12 @@ app.use(session({
 const titelbildOrdner = join(process.cwd(), 'src', 'assets', 'titelbild');
 const filmOrdner = join(process.cwd(), 'src', 'assets', 'filme');
 const tempOrdner = join(process.cwd(), 'uploads', 'temp');
+
+const wss = new WebSocketServer({ port: 4000 });
+
+wss.on('error', (error) => {
+  console.error('WebSocket Server Error:', error);
+});
 
 /*// temporäres Speichern*/
 const upload = multer({
@@ -262,7 +270,6 @@ app.post('/api/movies/addAufruf/:idFilm', (req, res) => {
     'UPDATE Filme SET Aufrufe = Aufrufe + 1 WHERE idFilme = ?',
     [idFilm],
     (err, result) => {
-      console.log("UPDATE ausgeführt, affectedRows:");
 
       if (err) {
         console.log(err);
@@ -739,6 +746,42 @@ app.post('/api/movies',
     );
   }
 );
+
+wss.on('connection', function connection(ws) {
+  console.log('Client connected');
+
+  ws.on('message', (message) => {
+    const data = JSON.parse(message.toString());
+    console.log('Received:', data);
+    switch (data.type) {
+      case 'like':
+        console.log('Like update', data.payload);
+        break;
+
+      case 'kommentar':
+        console.log('Kommentar', data.payload);
+        break;
+
+      case 'aufrufe':
+        console.log('Aufrufe', data.payload);
+        break;
+    }
+    // Broadcast to all clients (including sender)
+    wss.clients.forEach(function each(client) {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(JSON.stringify(data));
+      }
+    });
+  });
+
+  // Send a welcome message
+  ws.send(JSON.stringify({
+    type: 'system',
+    payload: { message: 'Film Socket läuft' }
+  }));
+});
+
+console.log('WebSocket server auf ws://localhost:8080');
 
 app.use(
   express.static(browserDistFolder, {

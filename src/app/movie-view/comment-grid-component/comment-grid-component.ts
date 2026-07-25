@@ -28,7 +28,7 @@ export class CommentGridComponent implements OnChanges, OnDestroy {
     }
 
     const kommentar: CommentCardInterface = {
-      Verfasser: String(this.authService.currentUsername),
+      Verfasser: String(this.authService.currentUsername()),
       Inhalt: this.inhalt,
       idFilm: this.idFilm,
       Datum: String(new Date())
