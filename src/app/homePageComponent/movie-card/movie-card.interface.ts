@@ -4,5 +4,6 @@ export interface MovieCardInterface {
   Beschreibung: string;
   UploadDatum: string;
   Aufrufe: number;
+  Anzeigename: string;
   Likes: number;
 }

@@ -12,7 +12,7 @@ import { LikeInterface } from './like.interface';
   selector: 'app-movie-view',
   templateUrl: './movie-view.html',
   styleUrl: './movie-view.css',
-  imports: [CommentGridComponent, AsyncPipe, DatePipe],
+  imports: [CommentGridComponent, AsyncPipe, DatePipe, RouterLink],
 })
 export class MovieView implements OnInit {
   readonly movieURL: string;

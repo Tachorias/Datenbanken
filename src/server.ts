@@ -227,11 +227,22 @@ app.get('/api/movies/aufrufe', (req, res) => {
 })
 
 app.get('/api/movies/search/:id', (req, res) => {
-  const sql = `SELECT f.*,COUNT(l.Nutzer) AS Likes
-    FROM Filme f LEFT JOIN Likes l
-    ON f.idFilme = l.idFilm
+  const sql = `
+    SELECT
+      f.*,
+      p.Anzeigename,
+      COUNT(l.Nutzer) AS Likes
+    FROM Filme f
+           LEFT JOIN Likes l
+                     ON f.idFilme = l.idFilm
+           JOIN Filmverwaltung fv
+                ON fv.idFilm = f.idFilme
+           JOIN Produzenten p
+                ON p.Nutzername = fv.Produzent
     WHERE f.idFilme = ?
-    GROUP BY f.idFilme
+    GROUP BY
+      f.idFilme,
+      p.Anzeigename
   `;
 
   con.query(sql, [req.params.id], (err, result) => {
@@ -330,10 +341,21 @@ app.post('/api/login', (req, res) => {
 
       req.session.username = user.Nutzername;
 
-      res.json({
-        message: 'Login erfolgreich',
-        username: user.Nutzername
-      });
+      con.query(
+        'SELECT * FROM Produzenten WHERE Nutzername = ?',
+        [user.Nutzername],
+        (err, result:any)=>{
+
+          res.json({
+
+            message:'Login erfolgreich',
+            username:user.Nutzername,
+            istProduzent: result.length > 0
+
+          });
+
+        }
+      );
 
     }
   );
@@ -343,15 +365,72 @@ app.get('/api/user',(req,res)=>{
 
   if(req.session.username){
 
-    res.json({
-      username: req.session.username
-    });
+    con.query(
+      'SELECT * FROM Produzenten WHERE Nutzername = ?',
+      [req.session.username],
+      (err,result:any)=>{
 
-  }else{
+        if(err){
+          res.status(500).send();
+          return;
+        }
+
+
+        res.json({
+          username: req.session.username,
+          istProduzent: result.length > 0
+        });
+
+      }
+    );
+
+
+  } else {
+
     res.status(401).send('Nicht eingeloggt');
 
   }
 
+});
+
+app.get('/api/produzent', (req, res) => {
+  if (!req.session.username) {
+    res.status(401).json({
+      message: 'Nicht eingeloggt'
+    });
+    return;
+  }
+  con.query(
+    `
+    SELECT * FROM Produzenten WHERE Nutzername = ?`,
+    [req.session.username],
+    (err, result:any) => {
+
+      if (err) {
+        console.error(err);
+
+        res.status(500).json({
+          message:'Fehler beim Laden der Produzentendaten'
+        });
+        return;
+      }
+      if (result.length === 0) {
+
+        res.json({
+          istProduzent:false
+        });
+
+        return;
+      }
+      const produzent = result[0];
+      res.json({
+        istProduzent:true,
+        anzeigename: produzent.Anzeigename,
+        studiengang: produzent.Studiengang,
+        email: produzent.Email
+      });
+    }
+  );
 });
 
 app.post('/api/logout',(req,res)=>{
@@ -367,35 +446,162 @@ app.post('/api/logout',(req,res)=>{
 });
 
 app.post('/api/register', async (req, res) => {
+
   const username = req.body.username;
   const password = req.body.password;
 
+  const rolle = req.body.rolle;
+  const anzeigename = req.body.anzeigename;
+  const studiengang = req.body.studiengang;
+  const email = req.body.email;
+
+  if (!username || !password) {
+    res.status(400).json({
+      message: 'Bitte Benutzername und Passwort angeben.'
+    });
+    return;
+  }
+
+  if (rolle === 'produzent') {
+    if (!anzeigename || !studiengang || !email) {
+      res.status(400).json({
+        message: 'Bitte alle Produzentendaten ausfüllen.'
+      });
+      return;
+    }
+  }
+
   try {
+
     const hashedPassword = await bcrypt.hash(password, 10);
-    con.query(
-      'INSERT INTO Benutzer (Nutzername, Passwort) VALUES (?, ?)',
-      [username, hashedPassword],
-      (err) => {
-        if (err) {
-          res.status(500).send('Fehler beim Speichern des Benutzers');
-        } else {
-          res.json({
-            message: 'Registrierung erfolgreich'
-          });
-        }
+
+    con.beginTransaction((err) => {
+
+      if (err) {
+        console.error(err);
+        res.status(500).json({
+          message: 'Fehler beim Starten der Transaktion.'
+        });
+        return;
       }
-    );
-  } catch {
-    res.status(500).send('Fehler beim Hashen des Passworts');
+
+      // Benutzer speichern
+      con.query(
+        'INSERT INTO Benutzer (Nutzername, Passwort) VALUES (?, ?)',
+        [username, hashedPassword],
+        (err) => {
+
+          if (err) {
+            return con.rollback(() => {
+              console.error(err);
+              res.status(500).json({
+                message: 'Benutzername existiert bereits.'
+              });
+            });
+          }
+
+          // Normaler Nutzer
+          if (rolle !== 'produzent') {
+
+            return con.commit((err) => {
+
+              if (err) {
+                return con.rollback(() => {
+                  console.error(err);
+                  res.status(500).json({
+                    message: 'Fehler beim Speichern.'
+                  });
+                });
+              }
+              res.json({
+                message: 'Registrierung erfolgreich.'
+              });
+            });
+          }
+
+          // Produzent speichern
+          con.query(
+            `INSERT INTO Produzenten
+            (Nutzername, Anzeigename, Studiengang, Email)
+            VALUES (?, ?, ?, ?)`,
+            [
+              username,
+              anzeigename,
+              studiengang,
+              email
+            ],
+            (err) => {
+
+              if (err) {
+                return con.rollback(() => {
+                  console.error(err);
+                  res.status(500).json({
+                    message: 'Produzent konnte nicht gespeichert werden.'
+                  });
+                });
+              }
+              con.commit((err) => {
+
+                if (err) {
+                  return con.rollback(() => {
+                    console.error(err);
+                    res.status(500).json({
+                      message: 'Fehler beim Abschließen der Registrierung.'
+                    });
+                  });
+                }
+                res.json({
+                  message: 'Produzent erfolgreich registriert.'
+                });
+              });
+            }
+          );
+        }
+      );
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: 'Fehler beim Hashen des Passworts.'
+    });
   }
 });
 
+app.get('/api/movies/meine', (req, res) => {
 
+  if (!req.session.username) {
+    res.status(401).send('Nicht eingeloggt');
+    return;
+  }
+
+  con.query(
+    `
+    SELECT f.*
+    FROM Filme f
+    JOIN Filmverwaltung fv
+      ON fv.idFilm = f.idFilme
+    WHERE fv.Produzent = ?
+    ORDER BY f.UploadDatum DESC
+    `,
+    [req.session.username],
+    (err, result) => {
+
+      if (err) {
+        res.status(500).send('Fehler');
+        return;
+      }
+
+      res.json(result);
+
+    }
+  );
+
+});
 
 
 /*// Titel und Beschreibung aus dem Formular lesen, Film in Datenbank anlegen, neue FilmID erstellen = Cover(jpeg) und Film(mp4)*/
-app.post(
-  '/api/movies',
+app.post('/api/movies',
   upload.fields([
     { name: 'cover', maxCount: 1 },
     { name: 'film', maxCount: 1 },
@@ -442,7 +648,15 @@ app.post(
             join(filmOrdner, `${filmId}.mp4`)
           );
         }
-
+        con.query(
+          'INSERT INTO Filmverwaltung (idFilm, Produzent) VALUES (?, ?)',
+          [filmId, req.session.username],
+          (err) => {
+            if (err) {
+              console.error(err);
+            }
+          }
+        );
         const kategorien = JSON.parse(req.body.kategorien || '[]') as number[];
 
         if (kategorien.length > 0) {

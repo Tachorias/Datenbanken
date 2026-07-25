@@ -15,6 +15,12 @@ export class RegisterComponent {
   benutzername = '';
   passwort = '';
 
+  rolle = 'nutzer';
+
+  anzeigename = '';
+  studiengang = '';
+  email = '';
+
   fehlermeldung = '';
 
   constructor(
@@ -24,20 +30,20 @@ export class RegisterComponent {
 
   registrieren() {
 
-    this.authService.register(this.benutzername, this.passwort).subscribe({
-
+    this.authService.register(
+      this.benutzername,
+      this.passwort,
+      this.rolle,
+      this.anzeigename,
+      this.studiengang,
+      this.email
+    ).subscribe({
       next: () => {
-
         this.router.navigate(['/login']);
-
       },
-
       error: (err) => {
-
         this.fehlermeldung = err.error.message;
-
       }
-
     });
 
   }

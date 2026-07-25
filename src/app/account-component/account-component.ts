@@ -1,54 +1,42 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../services/auth-service';
+import { AsyncPipe } from '@angular/common';
+import { ProduzentInterface } from './produzent.interface';
+import { Observable } from 'rxjs';
+import { MovieRow } from '../homePageComponent/movie-row/movie-row';
 
 @Component({
   selector: 'app-account-component',
   templateUrl: './account-component.html',
   styleUrl: './account-component.css',
+  imports: [AsyncPipe, RouterLink, RouterLinkActive, MovieRow],
 })
 export class AccountComponent implements OnInit {
-
-  benutzername: string | null = null;
-
+  produzent$!: Observable<ProduzentInterface>;
 
   constructor(
-    private authService: AuthService,
-    private router: Router
+    public authService: AuthService,
+    private router: Router,
   ) {}
 
+  getInitial(): string {
+    const username = this.authService.currentUsername();
+
+    if (!username) {
+      return '?';
+    }
+
+    return username.charAt(0).toUpperCase();
+  }
 
   ngOnInit(): void {
-
-    this.authService.getAktuellerUser()
-      .subscribe({
-
-        next: (user) => {
-
-          this.benutzername = user.Benutzername;
-
-        },
-
-        error: () => {
-
-          this.router.navigate(['/login']);
-
-        }
-
-      });
-
+    this.produzent$ = this.authService.getProduzent();
   }
-
 
   abmelden(): void {
-
-    this.authService.logout()
-      .subscribe(() => {
-
-        this.router.navigate(['/login']);
-
-      });
-
+    this.authService.logout().subscribe(() => {
+      this.router.navigate(['/login']);
+    });
   }
-
 }

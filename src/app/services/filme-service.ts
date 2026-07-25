@@ -22,6 +22,11 @@ export class FilmeService {
       .pipe(map(movies => movies[0]));
   }
 
+
+  getMeineFilme(): Observable<MovieCardInterface[]> {
+    return this.http.get<MovieCardInterface[]>('/api/movies/meine');
+  }
+
 // Welche Datei meinst du genau
   getFilmeNachKategorien(
     kategorieIds: number[],

@@ -15,7 +15,14 @@
           <div class="flex flex-row gap-3 text-sm flex-col justify-between">
             <div class="flex-1">
               <p class="text-6xl font-bold text-left">{{ movie.Titel }}</p>
-              <p class="text-sm text-left italic ml-2">von Produzent hochgeladen am {{movie.UploadDatum | date:'dd.MM.yyyy'}}</p>
+              <p class="text-sm text-left italic ml-2">von
+                <a
+                  [routerLink]="['/kategorien']"
+                  [queryParams]="{ suche: movie.Anzeigename }"
+                  class="text-blue-600 hover:underline">
+                  {{ movie.Anzeigename }}
+                </a>
+                hochgeladen am {{movie.UploadDatum | date:'dd.MM.yyyy'}}</p>
             </div>
             <div class="flex flex-col items-center gap-1 p-2 cursor-normal">
               <span class="text-2xl">👁️</span>

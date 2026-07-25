@@ -22,16 +22,66 @@
       [(ngModel)]="passwort"
       name="passwort">
 
-    @if(fehlermeldung){
+    <h2 class="font-bold mt-2">
+      Ich registriere mich als
+    </h2>
 
-      <p class="text-red-600">
-        {{fehlermeldung}}
+    <label class="flex items-center gap-2">
+      <input
+        type="radio"
+        name="rolle"
+        value="nutzer"
+        [(ngModel)]="rolle">
+
+      Nutzer
+    </label>
+
+    <label class="flex items-center gap-2">
+      <input
+        type="radio"
+        name="rolle"
+        value="produzent"
+        [(ngModel)]="rolle">
+
+      Produzent
+    </label>
+
+    @if (rolle === 'produzent') {
+
+      <input
+        class="border rounded-xl p-2"
+        type="text"
+        placeholder="Anzeigename"
+        [(ngModel)]="anzeigename"
+        name="anzeigename">
+
+      <input
+        class="border rounded-xl p-2"
+        type="text"
+        placeholder="Studiengang"
+        [(ngModel)]="studiengang"
+        name="studiengang">
+
+      <input
+        class="border rounded-xl p-2"
+        type="email"
+        placeholder="E-Mail"
+        [(ngModel)]="email"
+        name="email">
+
+    }
+
+    @if (fehlermeldung) {
+
+      <p class="text-red-600 font-bold">
+        {{ fehlermeldung }}
       </p>
 
     }
 
     <button
-      class="bg-green-600 text-white rounded-xl py-2">
+      class="bg-green-600 text-white rounded-xl py-2 hover:bg-green-700 transition"
+      type="submit">
 
       Registrieren
 
