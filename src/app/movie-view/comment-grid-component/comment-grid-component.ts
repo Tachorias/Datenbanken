@@ -1,11 +1,15 @@
-import { Component, Input, SimpleChanges, OnChanges, OnDestroy } from '@angular/core';
+import { Component, Input, SimpleChanges, OnChanges, OnDestroy, OnInit, inject, DestroyRef } from '@angular/core';
 import { CommentCardComponent } from '../comment-card-component/comment-card-component';
-import { Observable, Subscription, firstValueFrom } from 'rxjs';
+import { Observable, Subscription, firstValueFrom, Subject } from 'rxjs';
 import { CommentCardInterface } from '../comment-card-component/comment-card.interface';
 import { AsyncPipe } from '@angular/common';
 import {AuthService} from '../../services/auth-service';
 import {FormsModule} from '@angular/forms';
 import {CommentService} from '../../services/comment-service';
+import { WebSocketService } from '../../services/websocket-service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { switchMap, shareReplay, startWith } from 'rxjs/operators';
+
 
 @Component({
   selector: 'app-comment-grid-component',
@@ -14,11 +18,13 @@ import {CommentService} from '../../services/comment-service';
   templateUrl: './comment-grid-component.html',
   styleUrls: ['./comment-grid-component.css'],
 })
-export class CommentGridComponent implements OnChanges, OnDestroy {
+export class CommentGridComponent implements OnInit, OnDestroy {
   @Input() idFilm!: number;
   kommentare$!: Observable<CommentCardInterface[]>;
-  private sub?: Subscription;
+  private reload$ = new Subject<void>();
   inhalt = "";
+  private wsService = inject(WebSocketService);
+  private destroyRef = inject(DestroyRef);
 
   constructor(private commentService: CommentService, public authService: AuthService) {}
 
@@ -37,26 +43,36 @@ export class CommentGridComponent implements OnChanges, OnDestroy {
     this.inhalt = '';
     try {
       await firstValueFrom(this.commentService.addKommentar(kommentar));
-      this.ladeKommentare();
+      this.wsService.sendUpdate({ type: 'kommentar', payload: { filmId: this.idFilm } });
+      this.reload$.next();
     } catch (error) {
       console.error('Fehler beim Speichern des Kommentars:', error);
     }
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['idFilm'] && this.idFilm) {
-      this.ladeKommentare();
-    }
-  }
+  ngOnInit() {
+    this.wsService.connect();
 
-  ladeKommentare(): void {
-    if (!this.idFilm) return;
-    this.kommentare$ = this.commentService.getKommentare(this.idFilm);
-    this.sub?.unsubscribe();
-    this.sub = this.kommentare$.subscribe(() => {});
+    this.kommentare$ = this.reload$.pipe(
+      startWith(undefined),
+      switchMap(() => this.commentService.getKommentare(this.idFilm)),
+      shareReplay(1),
+      takeUntilDestroyed(this.destroyRef)
+    );
+
+    this.wsService.film$.pipe(
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe((msg) => {
+      if (msg.type === 'kommentar' && msg.payload.filmId === this.idFilm) {
+        console.log('Neuer Kommentar empfangen:', msg.payload);
+        this.reload$.next();
+      }
+    });
+    
+    this.reload$.next();
   }
 
   ngOnDestroy() {
-    this.sub?.unsubscribe();
+    this.reload$.complete();
   }
 }
