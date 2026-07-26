@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import {Test} from './test/test';
 import {LoginComponent} from './login-component/login-component';
 import {RegisterComponent} from './register-component/register-component';
 import {AgbComponent} from './legalComponent/agb-component/agb-component';
@@ -13,7 +12,6 @@ import { KategorienComponent } from './kategorien-component/kategorien-component
 
 export const routes: Routes = [
   {path: '', redirectTo: 'home', pathMatch: 'full'},
-  {path: 'test', component: Test},
   {path: 'login', component: LoginComponent},
   {path: 'register', component: RegisterComponent},
   {path: 'agb', component: AgbComponent},

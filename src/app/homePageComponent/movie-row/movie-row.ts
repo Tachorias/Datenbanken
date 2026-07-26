@@ -32,6 +32,7 @@ export class MovieRow implements OnChanges, OnDestroy {
     }
   }
 
+  // Lade die Filme abhängig von der Sortierung
   ladeFilme() {
     if (!this.daten) return;
     if (this.daten.sortierung === 'meine') {

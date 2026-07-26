@@ -11,7 +11,6 @@ import { createConnection, ResultSetHeader } from 'mysql2';
 import { renameSync } from 'node:fs';
 import multer from 'multer';
 import bcrypt from 'bcryptjs';
-import { SocketFilm } from './app/services/websocket-service';
 import WebSocket, { WebSocketServer } from 'ws';
 
 const browserDistFolder = join(import.meta.dirname, '../browser');
@@ -158,6 +157,7 @@ app.get('/api/movies/alt', (req, res) => {
   });
 });
 
+// Lädt alle Filme
 app.get('/api/movies', (req, res) => {
   con.query("SELECT * FROM Filme", (err, result) => {
     if (err) {
@@ -168,6 +168,7 @@ app.get('/api/movies', (req, res) => {
   });
 })
 
+// Lädt Filme nach Likes sortiert
 app.get('/api/movies/likes', (req, res) => {
   con.query('SELECT f.idFilme, f.Titel, f.Beschreibung, COUNT(l.idFilm) AS anzahl_likes ' +
     'FROM Filme f ' +
@@ -181,6 +182,8 @@ app.get('/api/movies/likes', (req, res) => {
     }
   });
 })
+
+// Lädt einen bestimmten Film nach ID
 app.get('/api/movies/search/:id', (req, res) => {
   const sql = `
     SELECT
@@ -209,6 +212,8 @@ app.get('/api/movies/search/:id', (req, res) => {
     res.json(result);
   });
 });
+
+// Lädt die Anzahl der Likes für einen bestimmten Film
 app.get('/api/movies/likes/:id', (req, res) => {
   con.query('SELECT COUNT(*) AS anzahl_likes FROM Likes WHERE idFilm = ?' , [req.params.id], (err, result) => {
     if (err) {
@@ -219,6 +224,7 @@ app.get('/api/movies/likes/:id', (req, res) => {
   });
 })
 
+// Prüft, ob ein bestimmter Nutzer einen Film geliked hat
 app.get('/api/movies/likes/:id/:nutzer', (req, res) => {
   con.query('SELECT COUNT(*) AS anzahl_likes FROM Likes WHERE idFilm = ? AND Nutzer = ?' , [req.params.id, req.params.nutzer], (err, result) => {
     if (err) {
@@ -229,6 +235,7 @@ app.get('/api/movies/likes/:id/:nutzer', (req, res) => {
   });
 })
 
+// Fügt einen Like zu einem Film hinzu
 app.post('/api/movies/addLike/:idFilm/:nutzer', (req, res) => {
   const { idFilm, nutzer } = req.params;
   con.query('INSERT INTO Likes (idFilm, Nutzer) VALUES (?, ?)', [idFilm, nutzer], (err, result) => {
@@ -240,6 +247,7 @@ app.post('/api/movies/addLike/:idFilm/:nutzer', (req, res) => {
   });
 });
 
+// Entfernt einen Like von einem Film
 app.delete('/api/movies/removeLike/:idFilm/:nutzer', (req, res) => {
   const { idFilm, nutzer } = req.params;
   con.query('DELETE FROM Likes WHERE idFilm = ? AND Nutzer = ?', [idFilm, nutzer], (err, result) => {
@@ -251,6 +259,7 @@ app.delete('/api/movies/removeLike/:idFilm/:nutzer', (req, res) => {
   });
 });
 
+// Lädt Filme nach Aufrufen sortiert
 app.get('/api/movies/aufrufe', (req, res) => {
   con.query('SELECT * FROM Filme ORDER BY Aufrufe DESC ', (err, result) => {
     if (err) {
@@ -261,6 +270,7 @@ app.get('/api/movies/aufrufe', (req, res) => {
   });
 })
 
+// Fügt einen Aufruf zu einem Film hinzu
 app.post('/api/movies/addAufruf/:idFilm', (req, res) => {
   console.log("POST angekommen");
 
@@ -282,6 +292,7 @@ app.post('/api/movies/addAufruf/:idFilm', (req, res) => {
   );
 });
 
+// Lädt Filme, die der eingeloggte Benutzer geliked hat
 app.get('/api/movies/meineLikes', (req, res) => {
 
   if (!req.session.username) {
@@ -310,6 +321,7 @@ app.get('/api/movies/meineLikes', (req, res) => {
   );
 });
 
+// Speichert einen Kommentar zu einem Film
 app.post("/api/movies/kommentar", (req, res) => {
 
   const { idFilm, Inhalt } = req.body;
@@ -339,6 +351,7 @@ app.post("/api/movies/kommentar", (req, res) => {
 
 });
 
+// Lädt Kommentare zu einem Film
 app.get('/api/movies/kommentare/:id', (req, res) => {
   con.query('SELECT * FROM Kommentar WHERE idFilm = ? ORDER BY Datum DESC' , [req.params.id] , (err, result) => {
     if (err) {
@@ -349,6 +362,7 @@ app.get('/api/movies/kommentare/:id', (req, res) => {
   })
 })
 
+// Login eines Benutzers
 app.post('/api/login', (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
@@ -416,6 +430,7 @@ app.post('/api/login', (req, res) => {
   );
 });
 
+// Lädt Benutzerdaten des eingeloggten Benutzers
 app.get('/api/user',(req,res)=>{
 
   if(req.session.username){
@@ -448,6 +463,7 @@ app.get('/api/user',(req,res)=>{
 
 });
 
+// Lädt Produzentendaten des eingeloggten Benutzers
 app.get('/api/produzent', (req, res) => {
   if (!req.session.username) {
     res.status(401).json({
@@ -500,6 +516,7 @@ app.post('/api/logout',(req,res)=>{
 
 });
 
+// Registrierung eines neuen Benutzers
 app.post('/api/register', async (req, res) => {
 
   const username = req.body.username;
@@ -623,6 +640,7 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
+// Lädt Filme des eingeloggten Produzenten
 app.get('/api/movies/meine', (req, res) => {
 
   if (!req.session.username) {
@@ -747,6 +765,7 @@ app.post('/api/movies',
   }
 );
 
+//Websocket-Server für Live-Updates von Likes, Kommentaren und Aufrufen
 wss.on('connection', function connection(ws) {
   console.log('Client connected');
 
@@ -781,7 +800,7 @@ wss.on('connection', function connection(ws) {
   }));
 });
 
-console.log('WebSocket server auf ws://localhost:8080');
+console.log('WebSocket server auf ws://localhost:4000');
 
 app.use(
   express.static(browserDistFolder, {

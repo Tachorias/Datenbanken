@@ -22,10 +22,10 @@ export class MovieView implements OnInit {
   movie$!: Observable<MovieCardInterface>;
   likes = signal<number>(0);
   aufrufe = signal<number>(0);
-  kommentare =  signal<number>(0);
   private filmeService = inject(FilmeService);
   public authService = inject(AuthService);
   isLiked$!: Observable<LikeInterface>;
+  //Für das WebSocket-Update
   private platformId = inject(PLATFORM_ID);
   private wsService = inject(WebSocketService);
   private destroyRef = inject(DestroyRef);
@@ -51,17 +51,16 @@ export class MovieView implements OnInit {
 
 
   ngOnInit(): void {
+    //Film Id aus der Route holen
     const id = Number(this.route.snapshot.paramMap.get('id'));
-
+    // WebSocket-Verbindung herstellen und auf Updates hören
     this.wsService.connect();
-
     this.wsService.film$.pipe(
       takeUntilDestroyed(this.destroyRef),
     ).subscribe((msg) => {
       const film = this.filmeService.getFilm(id);
       switch (msg.type) {
         case 'kommentar':
-          film.subscribe(movie => {this.kommentare.set(movie.idFilme)});
           console.log('Neuer Kommentar empfangen:', msg.payload);
           break;
         case 'system':
@@ -76,7 +75,7 @@ export class MovieView implements OnInit {
           break;
       }
     });
-
+    // Aufruf des Films speichern, nur wenn es sich um einen Browser handelt
     if (isPlatformBrowser(this.platformId)) {
       this.filmeService.addAufruf(id).subscribe({
         next: () => console.log('Aufruf gespeichert'),
@@ -85,7 +84,8 @@ export class MovieView implements OnInit {
     }
 
     this.movie$ = this.filmeService.getFilm(id);
-    this.movie$.subscribe(movie => {this.likes.set(movie.Likes);this.aufrufe.set(movie.Aufrufe); this.kommentare.set(movie.idFilme)});
+    // Likes und Aufrufe als Signal um sie mit Websocket-Updates zu aktualisieren
+    this.movie$.subscribe(movie => {this.likes.set(movie.Likes);this.aufrufe.set(movie.Aufrufe);});
     this.wsService.sendUpdate({ type: 'aufrufe', payload: { filmId: id } });
   }
 

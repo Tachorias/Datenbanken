@@ -12,7 +12,7 @@
             </div>
 
           </div>
-          <div class="flex flex-row gap-3 text-sm flex-col justify-between">
+          <div class="flex gap-3 text-sm flex-row justify-between">
             <div class="flex-1">
               <p class="text-6xl font-bold text-left">{{ movie.Titel }}</p>
               <p class="text-sm text-left italic ml-2">von
@@ -59,7 +59,7 @@
         </div>
 
         <div class="w-2/5 mr-4">
-          <app-comment-grid-component [idFilm]="kommentare()"></app-comment-grid-component>
+          <app-comment-grid-component [idFilm]="movie.idFilme"></app-comment-grid-component>
         </div>
 
       </div>

@@ -1,6 +1,6 @@
-import { Component, Input, SimpleChanges, OnChanges, OnDestroy, OnInit, inject, DestroyRef } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, inject, DestroyRef } from '@angular/core';
 import { CommentCardComponent } from '../comment-card-component/comment-card-component';
-import { Observable, Subscription, firstValueFrom, Subject } from 'rxjs';
+import { Observable, firstValueFrom, Subject } from 'rxjs';
 import { CommentCardInterface } from '../comment-card-component/comment-card.interface';
 import { AsyncPipe } from '@angular/common';
 import {AuthService} from '../../services/auth-service';
@@ -68,7 +68,7 @@ export class CommentGridComponent implements OnInit, OnDestroy {
         this.reload$.next();
       }
     });
-    
+
     this.reload$.next();
   }
 

@@ -16,7 +16,7 @@ export class WebSocketService {
   private socket$!: WebSocketSubject<SocketFilm>;
   private filmSubject$ = new Subject<SocketFilm>();
 
-  // Public observable for components to subscribe to
+  // Das Observable das abonniert werden kann
   public film$ = this.filmSubject$.asObservable();
 
   private socketEndpoint = 'ws://localhost:4000';
@@ -31,7 +31,7 @@ export class WebSocketService {
           error: error => console.error('WebSocket connection error:', error),
           complete: () => console.warn('WebSocket connection closed')
         }),
-        retry({ count: 10, delay: (error, retryCount) => timer(Math.min(1000 * Math.pow(2, retryCount), 30000)) }),
+        retry({ count: 10, delay: (error, retryCount) => timer(3000) }),
         catchError(error => {
           console.error('WebSocket failed after 10 retries', error);
           return EMPTY;
@@ -62,12 +62,4 @@ export class WebSocketService {
     }
   }
 
-  public disconnect(): void {
-    if (this.connectionSubscription) {
-      this.connectionSubscription.unsubscribe();
-    }
-    if (this.socket$) {
-      this.socket$.complete();
-    }
-  }
 }
