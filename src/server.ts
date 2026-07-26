@@ -46,7 +46,7 @@ const upload = multer({
   dest: tempOrdner,
 });
 
-/*// Damit Datein erreichbar im Browser*/
+/*// Damit Dateien erreichbar im Browser*/
 app.use('/assets', express.static(join(process.cwd(), 'src', 'assets')));
 const angularApp = new AngularNodeAppEngine();
 var con = createConnection({
