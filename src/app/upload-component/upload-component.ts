@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { AsyncPipe } from '@angular/common';
 import { Observable } from 'rxjs';
+import {Router} from '@angular/router';
 
 interface Kategorie {
   idKategorie: number;
@@ -27,6 +28,8 @@ export class UploadComponent {
   kategorien$: Observable<Kategorie[]>;
   ausgewaehlteKategorien: number[] = [];
 
+
+
   /*// Kategorien an oder aus*/
   kategorieUmschalten(idKategorie: number): void {
     if (this.ausgewaehlteKategorien.includes(idKategorie)) {
@@ -42,7 +45,7 @@ export class UploadComponent {
   }
 
   /*// Lädt Kategorien vom Server*/
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private router: Router) {
     this.kategorien$ = this.http.get<Kategorie[]>('/api/kategorien');
   }
 
@@ -102,6 +105,7 @@ export class UploadComponent {
       this.coverDatei = null;
       this.filmDatei = null;
       this.fehler = [];
+      this.router.navigate(['/account']);
     });
 
     if (this.ausgewaehlteKategorien.length === 0) {
